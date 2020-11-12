@@ -1,0 +1,29 @@
+{
+  "min_typicality": [
+    0.6342307692307692,
+    0.63,
+    0.5007692307692309,
+    0.37785714285714284,
+    0.5692857142857143,
+    0.52,
+    0.63,
+    0.5075000000000001,
+    0.41147058823529414,
+    0.42147058823529415
+  ],
+  "criterion2": 0,
+  "auhehzubntxvrazbachebzubnxwvrazbnchebzwihzwvegzbsckebyxcuxseuxzbachobzwbnxwvrazbabhovzwihzwvzvzbachebzubntxvrazbafheozubnxwkrazbnchgbzuknosgeqzbblhgspubnowvrqa": 0.6904761904761905,
+  "single_results": {
+    "nchebzwihzwvegzb": 0.42028985507246375,
+    "blhgspubnowvrqa": 0.463768115942029,
+    "sckebyxcuxseuxzb": 0.463768115942029,
+    "auhehzubntxvrazb": 0.391304347826087,
+    "afheozubnxwkrazb": 0.4057971014492754,
+    "achebzubntxvrazb": 0.391304347826087,
+    "achebzubnxwvrazb": 0.36231884057971014,
+    "nchgbzuknosgeqzb": 0.43478260869565216,
+    "abhovzwihzwvzvzb": 0.463768115942029,
+    "achobzwbnxwvrazb": 0.4057971014492754
+  },
+  "average_typicality Criterion1": 0.42028985507246375
+}

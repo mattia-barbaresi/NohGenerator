@@ -1,0 +1,21 @@
+{
+  "aniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrwzaniezxvahchbwrw": 0.6354166666666666,
+  "min_typicality": [
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.42657894736842095,
+    0.40657894736842104
+  ],
+  "criterion2": 1,
+  "single_results": {
+    "aniezxvahchbwrw": 0.59375,
+    "aniezxvahchbwrwz": 0.5833333333333334
+  },
+  "average_typicality Criterion1": 0.584375
+}

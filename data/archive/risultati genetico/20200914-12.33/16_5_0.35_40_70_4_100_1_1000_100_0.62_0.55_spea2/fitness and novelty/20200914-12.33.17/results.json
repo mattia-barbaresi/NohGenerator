@@ -1,0 +1,180 @@
+{
+  "repertoire": {
+    "repertoire": [
+      {
+        "category": "1",
+        "choreo": "azrtxwwgxyntzmay",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "anbzhiuayvbzubay",
+        "actor": "warrior"
+      },
+      {
+        "category": "2",
+        "choreo": "avnevbhzxbwwwzcr",
+        "actor": "warrior"
+      },
+      {
+        "category": "1",
+        "choreo": "aljgzrtmydiaklra",
+        "actor": "priest"
+      },
+      {
+        "category": "1",
+        "choreo": "azpxowwqxmnldylm",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "abcewhvxfnubzrha",
+        "actor": "warrior"
+      }
+    ]
+  },
+  "statistics": {
+    "std": 0.17468053147868287,
+    "max": 0.97,
+    "mean": 0.6309255279034691,
+    "min": 0.4575
+  },
+  "parameters": {
+    "MUTPB": 0.35,
+    "max_number_of_mutations": 4,
+    "t_max": 70,
+    "multi_objective_selection": "spea2",
+    "t_min ": 40,
+    "dissim_threshold": 0.55,
+    "evaluation_method": "fitness and novelty",
+    "fitness_threshold": 0.62,
+    "population_size": 100,
+    "number_of_moves": 16,
+    "max_arch": 5,
+    "generations": 1000
+  },
+  "results": [
+    {
+      "ind": "azrtxgynwazymeth",
+      "value": [
+        0.8616666666666668,
+        0.28217261904761903
+      ]
+    },
+    {
+      "ind": "atgtdgynwazymwjx",
+      "value": [
+        0.76,
+        0.3227747252747252
+      ]
+    },
+    {
+      "ind": "ltjtvgynwkzvpetb",
+      "value": [
+        0.4664705882352942,
+        0.47023897058823527
+      ]
+    },
+    {
+      "ind": "ltjtvgynwjzvpetb",
+      "value": [
+        0.47750000000000004,
+        0.4275735294117647
+      ]
+    },
+    {
+      "ind": "azrtxoyqwjzcmwts",
+      "value": [
+        0.6866666666666665,
+        0.3351348039215687
+      ]
+    },
+    {
+      "ind": "lzrtxoynwpzvpetb",
+      "value": [
+        0.53375,
+        0.4018627450980392
+      ]
+    },
+    {
+      "ind": "azitdglrdtzamwtm",
+      "value": [
+        0.6292307692307693,
+        0.3634065934065934
+      ]
+    },
+    {
+      "ind": "azrtxgynwazymwtx",
+      "value": [
+        0.97,
+        0.20650641025641023
+      ]
+    },
+    {
+      "ind": "ltjtvgynwkzvpetb",
+      "value": [
+        0.4664705882352942,
+        0.4350919117647059
+      ]
+    },
+    {
+      "ind": "ltjtvgynwkzvpwjd",
+      "value": [
+        0.4575,
+        0.4427310924369748
+      ]
+    }
+  ],
+  "list_of_moves": {
+    "a": "data/poses/armsdown",
+    "c": "data/poses/swordrightleftrequest",
+    "b": "data/poses/swordright",
+    "e": "data/poses/rightopen",
+    "d": "data/poses/openarms",
+    "g": "data/poses/extremelysadchest",
+    "f": "data/poses/rightup45",
+    "i": "data/poses/arms45",
+    "h": "data/poses/swordleft",
+    "k": "data/poses/requestright",
+    "j": "data/poses/rightsadchest",
+    "m": "data/poses/offering",
+    "l": "data/poses/request",
+    "o": "data/poses/sadleft",
+    "n": "data/poses/armsforward",
+    "q": "data/poses/sadright",
+    "p": "data/poses/extremelysad",
+    "s": "data/poses/armsinit",
+    "r": "data/poses/openarmsextended",
+    "u": "data/poses/shieldleft",
+    "t": "data/poses/armsuppraying",
+    "w": "right",
+    "v": "data/poses/shieldright",
+    "y": "backward",
+    "x": "left",
+    "z": "forward"
+  },
+  "ncd": 0.6434782608695652,
+  "archive": [
+    "tngwyfmpyanzqrto",
+    "ranxyyznzazygzeg",
+    "warwdgtczjtpmztx",
+    "aaziymtnuazykztx",
+    "oxnmbxgmtnzybwtb",
+    "xyrwtggmxszvmwfx",
+    "azrwgglixalyhkzx",
+    "ajrwvwynwrgwmwrw"
+  ],
+  "min_distance": [
+    0.8616666666666668,
+    0.76,
+    0.4664705882352942,
+    0.47750000000000004,
+    0.6866666666666665,
+    0.53375,
+    0.6292307692307693,
+    0.97,
+    0.4664705882352942,
+    0.4575
+  ],
+  "time elapsed": 1876.3920001983643
+}

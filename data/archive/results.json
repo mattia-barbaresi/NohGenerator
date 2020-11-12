@@ -1,0 +1,118 @@
+{
+  "repertoire": [
+    {
+      "category": "1",
+      "choreo": "abcdabefabcgbfea"
+    },
+    {
+      "category": "2",
+      "choreo": "hibebajkldaebmda"
+    },
+    {
+      "category": "1",
+      "choreo": "ldaebmdabldanoba"
+    },
+    {
+      "category": "2",
+      "choreo": "alcibebaebcdaebk"
+    },
+    {
+      "category": "2",
+      "choreo": "bmiafbaebcdaebka"
+    },
+    {
+      "category": "1",
+      "choreo": "amialdbohpicenla"
+    },
+    {
+      "category": "2",
+      "choreo": "aidbieclkdaikdba"
+    },
+    {
+      "category": "2",
+      "choreo": "bkldaidlbebaibea"
+    },
+    {
+      "category": "1",
+      "choreo": "milkdgjihdbnfbcd"
+    },
+    {
+      "category": "2",
+      "choreo": "akfkekaildkhkeba"
+    },
+    {
+      "category": "1",
+      "choreo": "edkimbehihopmfba"
+    },
+    {
+      "category": "2",
+      "choreo": "bfahbiefkibdhbek"
+    },
+    {
+      "category": "2",
+      "choreo": "kedneihbefbhdfke"
+    },
+    {
+      "category": "2",
+      "choreo": "hihbcdfabebkldhn"
+    },
+    {
+      "category": "1",
+      "choreo": "dpadmqdopqmdejfk"
+    }
+  ],
+  "list of moves": {
+    "a": "data/poses/armsdown",
+    "c": "data/poses/swordrightleftrequest",
+    "b": "data/poses/swordright",
+    "e": "data/poses/rightopen",
+    "d": "data/poses/openarms",
+    "g": "data/poses/extremelysadchest",
+    "f": "data/poses/rightup45",
+    "i": "data/poses/arms45",
+    "h": "data/poses/swordleft",
+    "k": "data/poses/requestright",
+    "j": "data/poses/rightsadchest",
+    "m": "data/poses/offering",
+    "l": "data/poses/request",
+    "o": "data/poses/sadleft",
+    "n": "data/poses/armsforward",
+    "q": "data/poses/sadright",
+    "p": "data/poses/extremelysad",
+    "s": "data/poses/armsinit",
+    "r": "data/poses/openarmsextended"
+  },
+  "results": [
+    {
+      "choreo": "nnsrhjhfsnqpkhrj",
+      "value": 0.44722222222222224
+    },
+    {
+      "choreo": "nnsrhjhfsnqpkhrj",
+      "value": 0.44722222222222224
+    },
+    {
+      "choreo": "nnsrhjhfsnqpkhrj",
+      "value": 0.44722222222222224
+    },
+    {
+      "choreo": "nnsrhjhfsnqpkhrj",
+      "value": 0.44722222222222224
+    }
+  ],
+  "parameters": {
+    "t_min ": 10,
+    "algorithm": "novelty and fitness",
+    "CXPB": 0.5,
+    "threshold_f_min": 0.3,
+    "fitness_threshold": 0.37,
+    "population_size": 100,
+    "number_of_moves": 16,
+    "novelty_threshold": 0.3,
+    "max_number_of_mutations": 4,
+    "t_max": 10,
+    "max_arch": 7,
+    "generations": 10000,
+    "MUTPB": 0.2
+  }
+}

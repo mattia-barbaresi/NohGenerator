@@ -1,0 +1,19 @@
+{
+  "supportLeg": "Legs",
+  "angles": {
+    "LShoulderRoll": 1.2,
+    "LShoulderPitch": -8.9,
+    "LElbowRoll": -85.8,
+    "LElbowYaw": -62.2,
+    "LWristYaw": -79.0,
+    "LHand": 1.0,
+    "RShoulderRoll": -30.0,
+    "RShoulderPitch": 67.5,
+    "RElbowRoll": 37.7,
+    "RElbowYaw": 7.4,
+    "RWristYaw": 59.1,
+    "RHand": 1,
+    "HeadPitch": 0,
+    "HeadYaw": 0
+  }
+}

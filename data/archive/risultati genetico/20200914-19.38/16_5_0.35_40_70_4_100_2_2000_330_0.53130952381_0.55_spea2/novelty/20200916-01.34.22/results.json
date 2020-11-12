@@ -1,0 +1,186 @@
+{
+  "repertoire": {
+    "repertoire": [
+      {
+        "category": "1",
+        "choreo": "azrtxwwgxyntzmay",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "anbzhiuayvbzubay",
+        "actor": "warrior"
+      },
+      {
+        "category": "2",
+        "choreo": "avnevbhzxbwwwzcr",
+        "actor": "warrior"
+      },
+      {
+        "category": "1",
+        "choreo": "aljgzrtmydiaklra",
+        "actor": "priest"
+      },
+      {
+        "category": "1",
+        "choreo": "azpxowwqxmnldylm",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "abcewhvxfnubzrha",
+        "actor": "warrior"
+      }
+    ]
+  },
+  "statistics": {
+    "std": 0.10649109036741353,
+    "max": 0.8049572649572649,
+    "mean": 0.6603661477411478,
+    "min": 0.43244047619047615
+  },
+  "parameters": {
+    "MUTPB": 0.35,
+    "max_number_of_mutations": 4,
+    "t_max": 70,
+    "multi_objective_selection": "spea2",
+    "t_min ": 40,
+    "dissim_threshold": 0.55,
+    "evaluation_method": "novelty",
+    "fitness_threshold": 0.5313095238095238,
+    "population_size": 100,
+    "number_of_moves": 16,
+    "max_arch": 5,
+    "generations": 2000
+  },
+  "results": [
+    {
+      "ind": "apvzfhuhebhnzukr",
+      "value": [
+        0.615,
+        0.3041517857142857
+      ]
+    },
+    {
+      "ind": "anbzwhnxaehbzucr",
+      "value": [
+        0.7446764346764346,
+        0.1877518315018315
+      ]
+    },
+    {
+      "ind": "actzfhuhewhbzikr",
+      "value": [
+        0.5683333333333334,
+        0.3803125
+      ]
+    },
+    {
+      "ind": "ziczehmheghnzuiw",
+      "value": [
+        0.43244047619047615,
+        0.4609375
+      ]
+    },
+    {
+      "ind": "anbywrnjaehbzucr",
+      "value": [
+        0.6565873015873016,
+        0.25733516483516483
+      ]
+    },
+    {
+      "ind": "anbzwhnxvwebzyir",
+      "value": [
+        0.731880341880342,
+        0.21348901098901096
+      ]
+    },
+    {
+      "ind": "anbzwhuxvwebzucr",
+      "value": [
+        0.8049572649572649,
+        0.1447115384615384
+      ]
+    },
+    {
+      "ind": "anbzwhuxvwhbzucr",
+      "value": [
+        0.7696581196581196,
+        0.17685439560439561
+      ]
+    },
+    {
+      "ind": "anbzwhnxawebzyir",
+      "value": [
+        0.6901282051282052,
+        0.2218269230769231
+      ]
+    },
+    {
+      "ind": "apvzfhuhebhbzykr",
+      "value": [
+        0.59,
+        0.32107142857142856
+      ]
+    }
+  ],
+  "list_of_moves": {
+    "a": "data/poses/armsdown",
+    "c": "data/poses/swordrightleftrequest",
+    "b": "data/poses/swordright",
+    "e": "data/poses/rightopen",
+    "d": "data/poses/openarms",
+    "g": "data/poses/extremelysadchest",
+    "f": "data/poses/rightup45",
+    "i": "data/poses/arms45",
+    "h": "data/poses/swordleft",
+    "k": "data/poses/requestright",
+    "j": "data/poses/rightsadchest",
+    "m": "data/poses/offering",
+    "l": "data/poses/request",
+    "o": "data/poses/sadleft",
+    "n": "data/poses/armsforward",
+    "q": "data/poses/sadright",
+    "p": "data/poses/extremelysad",
+    "s": "data/poses/armsinit",
+    "r": "data/poses/openarmsextended",
+    "u": "data/poses/shieldleft",
+    "t": "data/poses/armsuppraying",
+    "w": "right",
+    "v": "data/poses/shieldright",
+    "y": "backward",
+    "x": "left",
+    "z": "forward"
+  },
+  "ncd": 0.6576576576576577,
+  "archive": [
+    "qahcmphvpwebcizr",
+    "uahcyvrubnxlncjl",
+    "tambaugnvwbbwuzr",
+    "nyebswvnvfhbwizt",
+    "oabczufnzwbbenzu",
+    "aaibxahsawibwczi",
+    "rakbvavndhdyyvzr",
+    "ehrbxuhnzrebcckr",
+    "aubbehuxvwlbxhgd",
+    "anzvzhupvyyumaav",
+    "vnxkzhfpvwzooahr",
+    "atwzweuxyrzyefcw",
+    "bfbzfzfavuqhzbxb",
+    "axjzjinoviebzjay"
+  ],
+  "min_distance": [
+    0.5800000000000001,
+    0.6042857142857143,
+    0.47750000000000004,
+    0.38357142857142856,
+    0.61,
+    0.6976923076923077,
+    0.675,
+    0.6942307692307692,
+    0.665,
+    0.55375
+  ],
+  "time elapsed": 3596.723000049591
+}

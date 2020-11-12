@@ -1,0 +1,21 @@
+{
+  "zwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzwaybzwrmixvnxahzway": 0.7037037037037037,
+  "min_typicality": [
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.45666666666666667,
+    0.4714705882352941
+  ],
+  "criterion2": 1,
+  "single_results": {
+    "zwrmixvnxahzway": 0.6296296296296297,
+    "zwrmixvnxahzwayb": 0.6203703703703703
+  },
+  "average_typicality Criterion1": 0.6212962962962962
+}

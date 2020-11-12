@@ -1,0 +1,21 @@
+{
+  "min_typicality": [
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.87,
+    0.815
+  ],
+  "criterion2": 0,
+  "nwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwzmnwtyzgtaayrnxwz": 0.3770491803278688,
+  "single_results": {
+    "nwtyzgtaayrnxwz": 0.16326530612244897,
+    "nwtyzgtaayrnxwzm": 0.1836734693877551
+  },
+  "average_typicality Criterion1": 0.1816326530612245
+}

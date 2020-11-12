@@ -1,0 +1,207 @@
+{
+  "repertoire": {
+    "repertoire": [
+      {
+        "category": "1",
+        "choreo": "azrtxwwgxyntzmay",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "anbzhiuayvbzubay",
+        "actor": "warrior"
+      },
+      {
+        "category": "2",
+        "choreo": "avnevbhzxbwwwzcr",
+        "actor": "warrior"
+      },
+      {
+        "category": "1",
+        "choreo": "aljgzrtmydiaklra",
+        "actor": "priest"
+      },
+      {
+        "category": "1",
+        "choreo": "azpxowwqxmnldylm",
+        "actor": "priest"
+      },
+      {
+        "category": "2",
+        "choreo": "abcewhvxfnubzrha",
+        "actor": "warrior"
+      }
+    ]
+  },
+  "statistics": {
+    "std": 0.07830669379790532,
+    "max": 0.6393204365079366,
+    "mean": 0.5501323560125806,
+    "min": 0.36699195906432747
+  },
+  "parameters": {
+    "MUTPB": 0.35,
+    "max_number_of_mutations": 4,
+    "t_max": 70,
+    "multi_objective_selection": "spea2",
+    "t_min ": 40,
+    "dissim_threshold": 0.55,
+    "evaluation_method": "novelty",
+    "fitness_threshold": 0.4203267973856209,
+    "population_size": 100,
+    "number_of_moves": 16,
+    "max_arch": 5,
+    "generations": 1000
+  },
+  "results": [
+    {
+      "ind": "azrtbhiyznmwwxva",
+      "value": [
+        0.6378968253968254,
+        0.23532165750915746
+      ]
+    },
+    {
+      "ind": "azrtbhiyznmwgxva",
+      "value": [
+        0.6393204365079366,
+        0.17500000000000002
+      ]
+    },
+    {
+      "ind": "pzbwsoqyiomwwhvt",
+      "value": [
+        0.36699195906432747,
+        0.4247058823529412
+      ]
+    },
+    {
+      "ind": "agrtbhiyzkvebcua",
+      "value": [
+        0.5414624183006536,
+        0.31819852941176474
+      ]
+    },
+    {
+      "ind": "agtwbhvcznmrrxaa",
+      "value": [
+        0.5759915413533835,
+        0.27270833333333333
+      ]
+    },
+    {
+      "ind": "azrtbhiaznmwdxaa",
+      "value": [
+        0.5870658263305322,
+        0.2538095238095238
+      ]
+    },
+    {
+      "ind": "azrwihiyznmelcaa",
+      "value": [
+        0.5652205882352941,
+        0.2963235294117647
+      ]
+    },
+    {
+      "ind": "adrwmhiysnmrrxqa",
+      "value": [
+        0.46568014705882355,
+        0.3632589285714285
+      ]
+    },
+    {
+      "ind": "azrzbhisbnvelcva",
+      "value": [
+        0.5260296574770259,
+        0.3566559829059829
+      ]
+    },
+    {
+      "ind": "azrtbhoyznmwhxva",
+      "value": [
+        0.5956641604010026,
+        0.23842261904761902
+      ]
+    }
+  ],
+  "list_of_moves": {
+    "a": "data/poses/armsdown",
+    "c": "data/poses/swordrightleftrequest",
+    "b": "data/poses/swordright",
+    "e": "data/poses/rightopen",
+    "d": "data/poses/openarms",
+    "g": "data/poses/extremelysadchest",
+    "f": "data/poses/rightup45",
+    "i": "data/poses/arms45",
+    "h": "data/poses/swordleft",
+    "k": "data/poses/requestright",
+    "j": "data/poses/rightsadchest",
+    "m": "data/poses/offering",
+    "l": "data/poses/request",
+    "o": "data/poses/sadleft",
+    "n": "data/poses/armsforward",
+    "q": "data/poses/sadright",
+    "p": "data/poses/extremelysad",
+    "s": "data/poses/armsinit",
+    "r": "data/poses/openarmsextended",
+    "u": "data/poses/shieldleft",
+    "t": "data/poses/armsuppraying",
+    "w": "right",
+    "v": "data/poses/shieldright",
+    "y": "backward",
+    "x": "left",
+    "z": "forward"
+  },
+  "ncd": 0.6904761904761905,
+  "archive": [
+    "muayduwcnzalmkgd",
+    "gpmsjaifzctehrna",
+    "maayxhwrejckqrvq",
+    "tcdnkyildwkrumbz",
+    "wwywixznfamipsza",
+    "pnzymzvjfabihyyg",
+    "ctycunznfabbtbyt",
+    "nhriixmqfaucambb",
+    "nqzyazvaanntwegu",
+    "rhrabzvjzawbhvbg",
+    "thrlprznfantwrna",
+    "zkooizinanndryww",
+    "bdxyazhtmaaxavnz",
+    "yexyaxuyiaazhkyr",
+    "aexnajiaanhbhqna",
+    "rzzhlkstaggomqyr",
+    "aernazvomnaomcna",
+    "abgfdocayiuwcvyr",
+    "aldebwbutrwwhvwl",
+    "xxxtbzitxxwgylyr",
+    "amxtbzibmbtxksjf",
+    "asxdxjxgmmwworyr",
+    "azxzbzquuprfpdyr",
+    "xzxlnzilanwwvvlj",
+    "slrgrzexdnlcbvyr",
+    "kzgpxvvwavmwzutr",
+    "akravndkanmpkmkb",
+    "ekmeezwzbbmwabya",
+    "azettfivvtetcevz",
+    "azrwbzazznlszlso",
+    "agwtaggyhnkdayjt",
+    "lvmvlzyyhmnluuyr",
+    "aqdalyiyzylcabsa",
+    "izrjkmkyztkymycm",
+    "avlguhiiapxkgxfa"
+  ],
+  "min_distance": [
+    0.5244444444444445,
+    0.5522222222222223,
+    0.33499999999999996,
+    0.4766666666666667,
+    0.4778947368421053,
+    0.52,
+    0.52,
+    0.41625,
+    0.41657894736842094,
+    0.4678947368421053
+  ],
+  "time elapsed": 2195.697000026703
+}
