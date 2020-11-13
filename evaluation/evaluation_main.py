@@ -71,7 +71,6 @@ for path, subdirs, files in os.walk(root):
             # if "and" not in path:
             #     name_results = "results_serialized"
 
-            # collect all the results
             with open(os.path.join(path, name)) as fp:
                 for line in fp:
                     if line != "\n":
@@ -102,6 +101,7 @@ for path, subdirs, files in os.walk(root):
                         repertoire.append(line[:-1])
             fp.close()
 
+            # read results dict
             results_fitness_and_novelty = json_editor.read_dict(os.path.join(path, "results"))
             fit = []
             ncd_local = []
@@ -156,11 +156,12 @@ for path, subdirs, files in os.walk(root):
             # here I have all the directories with results
 
             # archive part
-            if "and" in path:
+            results_complete_archive = json_editor.read_dict(os.path.join(path, "res_arch"))
+            print "res: " + str("novelty" in path)
+            if ("novelty" in path) and len(results_complete_archive.values()) > 0:
                 results_archive = []
                 avg_fit_archive = 0
                 archive_string_complete = ""
-                results_complete_archive = json_editor.read_dict(os.path.join(path, "res_arch"))
                 fitness_Arch = []
                 ncd_local = []
                 nov_local = []
@@ -179,20 +180,24 @@ for path, subdirs, files in os.walk(root):
 
                 full_ncd_total["archive"] = ncd_local
                 all_results["archive"] = fitness_Arch
-                min_typ_total["archive"] = calculate_typicality_with_min_distance_from_files(results=results_archive,
-                                                                                             repertoire=repertoire)
+                min_typ_total["archive"] = calculate_typicality_with_min_distance_from_files(
+                    results=results_archive, repertoire=repertoire)
+
                 avg_fit_archive = avg_fit_archive / len(results_complete_archive.values())
+
                 fitness_archive_total.append(avg_fit_archive)
                 average_min_typicality_archive_total.append(average(
-                    calculate_typicality_with_min_distance_from_files(results=results_archive, repertoire=repertoire)))
-                full_ncd_archive_total.append(
-                    ritchie_criteria.compute_criterion_1(results=results_archive, string_repertoire=string_rep))
+                    calculate_typicality_with_min_distance_from_files(results=results_archive,
+                                                                      repertoire=repertoire)))
                 criterion1_archive_total.append(
+                    ritchie_criteria.compute_criterion_1(results=results_archive, string_repertoire=string_rep))
+                criterion2_archive_total.append(
                     ritchie_criteria.compute_criterion_2(results=results_archive, string_repertoire=string_rep,
                                                          alpha=0.5))
-                criterion2_archive_total.append(compute_ncd(archive_string_complete, string_rep))
+                full_ncd_archive_total.append(compute_ncd(archive_string_complete, string_rep))
                 len_Arch_full.append(len(results_complete_archive.values()))
             else:
+                print "WARNING - no archive found in path: " + path
                 fitness_archive_total.append("")
                 full_ncd_archive_total.append("")
                 criterion1_archive_total.append("")
@@ -265,7 +270,7 @@ df = DataFrame({
     '01_parameters': index1,
     "02_method": index2,
     "03_ncd_full": ncd_full,
-    "031_ sbc_rep": sbc_rep,
+    "031_sbc_rep": sbc_rep,
     "032_sbc_archive": sbc_archive,
     "033_sbc_res": sbc_res,
     '04_criterion 1': avg_typ,
