@@ -1,9 +1,7 @@
 import random
-
 import bcolors
-from deap import base, creator, tools
-
 import json_editor
+from deap import base, creator, tools
 from evaluation.evaluation import compute_ncd
 from evaluation.ritchie_criteria import compute_criterion_1, compute_criterion_2
 from evaluation.sbc import SBC
@@ -32,16 +30,17 @@ def print_pop(pop):
         print "".join(x), x.fitness.values
 
 
-# evaluation_method: 0 fitness, 1 novelty, 2 both
-# def create_choreography(number_of_generations):
-# def create_choreography(parameters, number_of_generations, evaluation_method, repertoirePath):
+
 def create_choreography(parameters):
     # initialization
     fitness_function = calculate_fitnesses
+    # evaluation_method: 0 fitness, 1 novelty, 2 both
     if parameters.evaluation_method_index == 1:
         fitness_function = calculate_novelty
 
     random.seed(parameters.random_seed)
+
+    # clear archive
     file_management.clearArchive()
     file_management.initres(parameters.full_name)
 

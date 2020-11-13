@@ -7,21 +7,25 @@ from genetic_algorithm import deap_algorithm as deap_algorithm, constants, file_
 from genetic_algorithm.Parameters import Parameters
 
 
-# repertoire index is the index of the corresponding path in constants
+# repertoire index is the index of the corresponding repertoire file in paths list in constants
 def init(number_of_generations, repertoire_index, evaluation_method_index, random_seed, dissim_threshold,
          fitness_threshold):
+
+    # set method string
     evaluation_method = "fitness"
     if evaluation_method_index == 1:
         evaluation_method = "novelty"
     elif evaluation_method_index == 2:
         evaluation_method = "fitness and novelty"
 
+    # init params
     parameters = Parameters(number_of_generations=number_of_generations,
                             repertoire_path=constants.REPERTOIRE_PATH[repertoire_index],
                             evaluation_method_index=evaluation_method_index,
                             random_seed=random_seed,
                             dissim_threshold=dissim_threshold,
                             fitness_threshold=fitness_threshold)
+    # full path name
     full_name = "data/results/" \
                 + str(constants.NUMBER_OF_MOVES) + "_" \
                 + str(constants.MAX_ARCH) + "_" \
@@ -37,45 +41,52 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
                 + str(parameters.dissim_threshold) \
                 + "/" + evaluation_method + "/"  # + "/" + now.strftime("%Y%m%d-%H.%M.%S") + "/"
 
+    # make results dir
     if not os.path.exists(full_name):
         try:
             os.makedirs(full_name)
-            print "init with path: " + full_name
+            print "init path: " + full_name
         except Exception as e:
             print e
     else:
         print "Dir already exist: " + full_name
 
     parameters.set_path(full_name)
+
+    # execution
     start_time = time.time()
     pop, generations = deap_algorithm.create_choreography(parameters)
-    # print "ending"
-    # Gather all the fitness values in one list and print the stats
-    fits = [ind.fitness.values[0] for ind in pop]
     time_elapsed = (time.time() - start_time)
+
+    # stats
     print("--- %s seconds ---" % str(time_elapsed))
+
+    # gather all the fitness values in one list
+    fits = [ind.fitness.values[0] for ind in pop]
     results_string = create_string_results(pop)
     repertoire_string = create_string_repertoire(
         file_management.getRepertoireWithPath(parameters.repertoire_path)["repertoire"])
-    ncd = compute_ncd(results_string, repertoire_string)
+
+    # compute metrics and stats
+    ncd = compute_ncd(results_string, repertoire_string)  # ncd
     res_list = []
     for x in pop:
         res_list.append("".join(x))
     sbc = SBC("bz2", "9", res_list)
     sbc_t = sbc.compute()  # sbc of generation
     rep_list = []
-
     # calculate sbc for repertoire
     for x in file_management.getRepertoireWithPath(parameters.repertoire_path)["repertoire"]:
         rep_list.append(x["choreo"])
     sbc = SBC("bz2", "9", rep_list)
     sbc_rep = sbc.compute()  # sbc of repertoire
-
+    # stats
     length = len(pop)
     mean = sum(fits) / length
     sum2 = sum(x * x for x in fits)
     std = abs(sum2 / length - mean ** 2) ** 0.5
     statistics = {"min": min(fits), "max": max(fits), "mean": mean, "std": std}
+
     parameters_to_serialize = {
         "generations": number_of_generations,
         "fitness_threshold": parameters.fitness_threshold,
@@ -91,6 +102,7 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
         "evaluation_method": evaluation_method
     }
 
+    # show results
     print("  Min %s" % min(fits))
     print("  Max %s" % max(fits))
     print("  Avg %s" % mean)
@@ -98,6 +110,7 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
     print("  Ncd %s" % ncd)
     print("  Sbc %s" % sbc_t)
 
+    # write results
     results = []
     # open file streams
     results_file = open(full_name + "results_serialized", "w")
@@ -136,4 +149,5 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
         # "strings" : [results_string, repertoire_string]
     }, full_name + "results")
 
+    # end
     print "end reached"
