@@ -1,8 +1,8 @@
-import argparse
-import sys
-import time
 
 import qi
+import time
+import sys
+import argparse
 
 
 class HumanGreeter(object):
@@ -74,8 +74,8 @@ if __name__ == "__main__":
         connection_url = "tcp://" + args.ip + ":" + str(args.port)
         app = qi.Application(["HumanGreeter", "--qi-url=" + connection_url])
     except RuntimeError:
-        print ("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) + ".\n"
-                                                                                              "Please check your script arguments. Run with -h option for help.")
+        print ("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " + str(args.port) +".\n"
+               "Please check your script arguments. Run with -h option for help.")
         sys.exit(1)
 
     human_greeter = HumanGreeter(app)

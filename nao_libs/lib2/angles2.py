@@ -1,5 +1,5 @@
+from common import arms
 import legs
-from nao_libs.common import arms
 
 
 def anglesList(msg):
@@ -20,26 +20,19 @@ def anglesList(msg):
             wristRight = i['coordinates']
         joints[i['jointname']] = i['coordinates']
 
-    listAngles["RShoulderPitch"] = arms.angleRShoulderPitch(shoulderRight[0], shoulderRight[1], shoulderRight[2],
-                                                            elbowRight[0], elbowRight[1],
+    listAngles["RShoulderPitch"] = arms.angleRShoulderPitch(shoulderRight[0], shoulderRight[1], shoulderRight[2], elbowRight[0], elbowRight[1],
                                                             elbowRight[2])
-    listAngles["RShoulderRoll"] = arms.angleRShoulderRoll(shoulderRight[0], shoulderRight[1], shoulderRight[2],
-                                                          elbowRight[0], elbowRight[1],
+    listAngles["RShoulderRoll"] = arms.angleRShoulderRoll(shoulderRight[0], shoulderRight[1], shoulderRight[2], elbowRight[0], elbowRight[1],
                                                           elbowRight[2])
-    listAngles["RElbowRoll"] = arms.angleRElbowRoll(shoulderRight[0], shoulderRight[1], shoulderRight[2], elbowRight[0],
-                                                    elbowRight[1],
+    listAngles["RElbowRoll"] = arms.angleRElbowRoll(shoulderRight[0], shoulderRight[1], shoulderRight[2], elbowRight[0], elbowRight[1],
                                                     elbowRight[2], wristRight[0], wristRight[1], wristRight[2])
-    listAngles["RElbowYaw"] = arms.angleRElbowYaw(elbowRight[0], elbowRight[1], elbowRight[2], wristRight[0],
-                                                  wristRight[1],
+    listAngles["RElbowYaw"] = arms.angleRElbowYaw(elbowRight[0], elbowRight[1], elbowRight[2], wristRight[0], wristRight[1],
                                                   wristRight[2], listAngles["RShoulderPitch"])
-    listAngles["LShoulderPitch"] = arms.angleLShoulderPitch(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2],
-                                                            elbowLeft[0], elbowLeft[1],
+    listAngles["LShoulderPitch"] = arms.angleLShoulderPitch(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2], elbowLeft[0], elbowLeft[1],
                                                             elbowLeft[2])
-    listAngles["LShoulderRoll"] = arms.angleLShouderRoll(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2],
-                                                         elbowLeft[0], elbowLeft[1],
+    listAngles["LShoulderRoll"] = arms.angleLShouderRoll(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2], elbowLeft[0], elbowLeft[1],
                                                          elbowLeft[2])
-    listAngles["LElbowRoll"] = arms.angleLElbowRoll(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2], elbowLeft[0],
-                                                    elbowLeft[1],
+    listAngles["LElbowRoll"] = arms.angleLElbowRoll(shoulderLeft[0], shoulderLeft[1], shoulderLeft[2], elbowLeft[0], elbowLeft[1],
                                                     elbowLeft[2], wristLeft[0], wristLeft[1], wristLeft[2])
     listAngles["LElbowYaw"] = arms.angleLElbowYaw(elbowLeft[0], elbowLeft[1], elbowLeft[2], wristLeft[0], wristLeft[1],
                                                   wristLeft[2], listAngles["LShoulderPitch"])
@@ -119,5 +112,6 @@ def anglesList(msg):
                                    joints["FootRight"][0],
                                    joints["FootRight"][1],
                                    joints["FootRight"][2])
+
 
     return listAngles

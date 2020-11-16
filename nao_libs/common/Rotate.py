@@ -1,9 +1,8 @@
 import math
-import time
 
 from naoqi import ALProxy
-
-from common import constants
+from nao_libs.common import constants
+import time
 
 
 def StiffnessOn(proxy):
@@ -35,12 +34,12 @@ def rotate_left(t):
     # PORT = 9559  # int(raw_input("robot Port (standard 9559): "))
     try:
         try:
-            motionProxy = ALProxy("ALMotion", robotIP, PORT)  # creates proxy to call specific functions
+            motionProxy = ALProxy("ALMotion", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to AlMotion"
             print "Error was: ", e
         try:
-            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT)  # creates proxy to call specific functions
+            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to ALRobotPosture"
             print "Error was: ", e
@@ -48,12 +47,12 @@ def rotate_left(t):
         angleLists = []
         timeLists = []
         StiffnessOn(motionProxy)
-        if (t == 0):  # if it is the first time the robot is called upon
-            motionProxy.setStiffnesses("Body", 0.0)  # unstiffens the joints
+        if (t == 0): # if it is the first time the robot is called upon
+            motionProxy.setStiffnesses("Body", 0.0) # unstiffens the joints
             motionProxy.wbEnable(True)
-            postureProxy.goToPosture("Stand", 10)  # gets the robot into his initial standing position
+            postureProxy.goToPosture("Stand", 10) # gets the robot into his initial standing position
             print("init")
-            t = t + 1
+            t = t+1
 
         motionProxy.wbEnable(True)
         # motionProxy.wbFootState("Plane", str(anglelist["supportLeg"]))
@@ -77,7 +76,7 @@ def rotate_left(t):
         # clearExisting = False
         # motionProxy.setFootSteps(legName, footSteps, timeList, clearExisting)
         # parameters = [["Frequency", 0.5], ["StepHeight", 0.005], ["MaxStepTheta", math.pi / 16]]
-        motionProxy.move(0.00, 0, math.pi / 16)
+        motionProxy.move(0.00, 0, math.pi/16)
         time.sleep(4)
         motionProxy.stopMove()
 
@@ -94,14 +93,15 @@ def rotate_left(t):
         #                                     ankle_position[0], ankle_position[1], ankle_position[2])
         # print z0
         # t += 1 # global t gets added by 1 so the joints dont get unstiffened again and the robot does not get put in its initial position
-    except Exception as e:  # checks for any and all errors
-        print "error here ", e
-        # ignores every single one of them, except keyboardInterupt and SystemExit
-    except (KeyboardInterrupt, SystemExit):  # when the program gets terminated
+    except Exception as e: # checks for any and all errors
+        print "error here " , e
+         # ignores every single one of them, except keyboardInterupt and SystemExit
+    except (KeyboardInterrupt, SystemExit): # when the program gets terminated
         print("error program terminated")
-        postureProxy.goToPosture("StandInit", 0.5)  # set the robot in its initial position
-        motionProxy.setStiffnesses("Body", 1.0)  # stiffen the joints
-        raise  # actually quit
+        postureProxy.goToPosture("StandInit", 0.5) # set the robot in its initial position
+        motionProxy.setStiffnesses("Body", 1.0) # stiffen the joints
+        raise #actually quit
+
 
 
 def rotate_right(t):
@@ -125,12 +125,12 @@ def rotate_right(t):
     # PORT = 9559  # int(raw_input("robot Port (standard 9559): "))
     try:
         try:
-            motionProxy = ALProxy("ALMotion", robotIP, PORT)  # creates proxy to call specific functions
+            motionProxy = ALProxy("ALMotion", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to AlMotion"
             print "Error was: ", e
         try:
-            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT)  # creates proxy to call specific functions
+            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to ALRobotPosture"
             print "Error was: ", e
@@ -138,12 +138,12 @@ def rotate_right(t):
         angleLists = []
         timeLists = []
         StiffnessOn(motionProxy)
-        if (t == 0):  # if it is the first time the robot is called upon
-            motionProxy.setStiffnesses("Body", 0.0)  # unstiffens the joints
+        if (t == 0): # if it is the first time the robot is called upon
+            motionProxy.setStiffnesses("Body", 0.0) # unstiffens the joints
             motionProxy.wbEnable(True)
-            postureProxy.goToPosture("Stand", 10)  # gets the robot into his initial standing position
+            postureProxy.goToPosture("Stand", 10) # gets the robot into his initial standing position
             print("init")
-            t = t + 1
+            t = t+1
 
         motionProxy.wbEnable(True)
         # motionProxy.wbFootState("Plane", str(anglelist["supportLeg"]))
@@ -167,7 +167,7 @@ def rotate_right(t):
         # clearExisting = False
         # motionProxy.setFootSteps(legName, footSteps, timeList, clearExisting)
         # parameters = [["Frequency", 0.5], ["StepHeight", 0.005], ["MaxStepTheta", math.pi / 16]]
-        motionProxy.move(0.00, 0, - math.pi / 16)
+        motionProxy.move(0.00, 0, - math.pi/16)
         time.sleep(4)
         motionProxy.stopMove()
 
@@ -184,11 +184,11 @@ def rotate_right(t):
         #                                     ankle_position[0], ankle_position[1], ankle_position[2])
         # print z0
         # t += 1 # global t gets added by 1 so the joints dont get unstiffened again and the robot does not get put in its initial position
-    except Exception as e:  # checks for any and all errors
-        print "error here ", e
-        # ignores every single one of them, except keyboardInterupt and SystemExit
-    except (KeyboardInterrupt, SystemExit):  # when the program gets terminated
+    except Exception as e: # checks for any and all errors
+        print "error here " , e
+         # ignores every single one of them, except keyboardInterupt and SystemExit
+    except (KeyboardInterrupt, SystemExit): # when the program gets terminated
         print("error program terminated")
-        postureProxy.goToPosture("StandInit", 0.5)  # set the robot in its initial position
-        motionProxy.setStiffnesses("Body", 1.0)  # stiffen the joints
-        raise  # actually quit
+        postureProxy.goToPosture("StandInit", 0.5) # set the robot in its initial position
+        motionProxy.setStiffnesses("Body", 1.0) # stiffen the joints
+        raise #actually quit

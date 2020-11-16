@@ -1,7 +1,6 @@
+from NaoLibs.Common import arms
 import legsSimple as legs
-from common import constants
-from nao_libs.common import arms
-
+from Common import constants
 
 def anglesList(msg):
     listAngles = {}
@@ -28,26 +27,19 @@ def anglesList(msg):
         support_leg = "RLeg"
     else:
         support_leg = "LLeg"
-    listAngles["RShoulderPitch"] = arms.angleRShoulderPitch(shoulderRight[0], shoulderRight[2], shoulderRight[1],
-                                                            elbowRight[0], elbowRight[2],
+    listAngles["RShoulderPitch"] = arms.angleRShoulderPitch(shoulderRight[0], shoulderRight[2], shoulderRight[1], elbowRight[0], elbowRight[2],
                                                             elbowRight[1])
-    listAngles["RShoulderRoll"] = arms.angleRShoulderRoll(shoulderRight[0], shoulderRight[2], shoulderRight[1],
-                                                          elbowRight[0], elbowRight[2],
+    listAngles["RShoulderRoll"] = arms.angleRShoulderRoll(shoulderRight[0], shoulderRight[2], shoulderRight[1], elbowRight[0], elbowRight[2],
                                                           elbowRight[1])
-    listAngles["RElbowRoll"] = arms.angleRElbowRoll(shoulderRight[0], shoulderRight[2], shoulderRight[1], elbowRight[0],
-                                                    elbowRight[2],
+    listAngles["RElbowRoll"] = arms.angleRElbowRoll(shoulderRight[0], shoulderRight[2], shoulderRight[1], elbowRight[0], elbowRight[2],
                                                     elbowRight[1], wristRight[0], wristRight[2], wristRight[1])
-    listAngles["RElbowYaw"] = arms.angleRElbowYaw(elbowRight[0], elbowRight[2], elbowRight[1], wristRight[0],
-                                                  wristRight[2],
+    listAngles["RElbowYaw"] = arms.angleRElbowYaw(elbowRight[0], elbowRight[2], elbowRight[1], wristRight[0], wristRight[2],
                                                   wristRight[1], listAngles["RShoulderPitch"])
-    listAngles["LShoulderPitch"] = arms.angleLShoulderPitch(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1],
-                                                            elbowLeft[0], elbowLeft[2],
+    listAngles["LShoulderPitch"] = arms.angleLShoulderPitch(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1], elbowLeft[0], elbowLeft[2],
                                                             elbowLeft[1])
-    listAngles["LShoulderRoll"] = arms.angleLShouderRoll(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1],
-                                                         elbowLeft[0], elbowLeft[2],
+    listAngles["LShoulderRoll"] = arms.angleLShouderRoll(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1], elbowLeft[0], elbowLeft[2],
                                                          elbowLeft[1])
-    listAngles["LElbowRoll"] = arms.angleLElbowRoll(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1], elbowLeft[0],
-                                                    elbowLeft[2],
+    listAngles["LElbowRoll"] = arms.angleLElbowRoll(shoulderLeft[0], shoulderLeft[2], shoulderLeft[1], elbowLeft[0], elbowLeft[2],
                                                     elbowLeft[1], wristLeft[0], wristLeft[2], wristLeft[1])
     listAngles["LElbowYaw"] = arms.angleLElbowYaw(elbowLeft[0], elbowLeft[2], elbowLeft[1], wristLeft[0], wristLeft[2],
                                                   wristLeft[1], listAngles["LShoulderPitch"])
@@ -105,46 +97,46 @@ def anglesList(msg):
     #                                               joints["Spine"][1])
 
     listAngles["LHipPitch"] = legs.calculateHipPitch(joints["HipLeft"][0],
-                                                     joints["HipLeft"][2],
-                                                     joints["HipLeft"][1],
-                                                     joints["KneeLeft"][0],
-                                                     joints["KneeLeft"][2],
-                                                     joints["KneeLeft"][1])
+                                                  joints["HipLeft"][2],
+                                                  joints["HipLeft"][1],
+                                                  joints["KneeLeft"][0],
+                                                  joints["KneeLeft"][2],
+                                                  joints["KneeLeft"][1])
     listAngles["RHipPitch"] = legs.calculateHipPitch(joints["HipRight"][0],
-                                                     joints["HipRight"][2],
-                                                     joints["HipRight"][1],
-                                                     joints["KneeRight"][0],
-                                                     joints["KneeRight"][2],
-                                                     joints["KneeRight"][1])
+                                                  joints["HipRight"][2],
+                                                  joints["HipRight"][1],
+                                                  joints["KneeRight"][0],
+                                                  joints["KneeRight"][2],
+                                                  joints["KneeRight"][1])
 
     listAngles["RHipRoll"] = legs.calculateHipRoll(joints["HipRight"][0],
-                                                   joints["HipRight"][2],
-                                                   joints["HipRight"][1],
-                                                   joints["KneeRight"][0],
-                                                   joints["KneeRight"][2],
-                                                   joints["KneeRight"][1], False)
+                                                  joints["HipRight"][2],
+                                                  joints["HipRight"][1],
+                                                  joints["KneeRight"][0],
+                                                  joints["KneeRight"][2],
+                                                  joints["KneeRight"][1], False)
     listAngles["LHipRoll"] = legs.calculateHipRoll(joints["HipLeft"][0],
-                                                   joints["HipLeft"][2],
-                                                   joints["HipLeft"][1],
-                                                   joints["KneeLeft"][0],
-                                                   joints["KneeLeft"][2],
-                                                   joints["KneeLeft"][1], True)
+                                                  joints["HipLeft"][2],
+                                                  joints["HipLeft"][1],
+                                                  joints["KneeLeft"][0],
+                                                  joints["KneeLeft"][2],
+                                                  joints["KneeLeft"][1], True)
     listAngles["RAnklePitch"] = legs.calculateAnklePitch(joints["KneeRight"][0],
-                                                         joints["KneeRight"][2],
-                                                         joints["KneeRight"][1],
-                                                         joints["AnkleRight"][0],
-                                                         joints["AnkleRight"][2],
-                                                         joints["AnkleRight"][1],
-                                                         joints["FootRight"][0],
-                                                         joints["FootRight"][2],
-                                                         joints["FootRight"][1])
+                                                       joints["KneeRight"][2],
+                                                       joints["KneeRight"][1],
+                                                       joints["AnkleRight"][0],
+                                                       joints["AnkleRight"][2],
+                                                       joints["AnkleRight"][1],
+                                                       joints["FootRight"][0],
+                                                       joints["FootRight"][2],
+                                                       joints["FootRight"][1])
     listAngles["LAnklePitch"] = legs.calculateAnklePitch(joints["KneeLeft"][0],
-                                                         joints["KneeLeft"][2],
-                                                         joints["KneeLeft"][1],
-                                                         joints["AnkleLeft"][0],
-                                                         joints["AnkleLeft"][2],
-                                                         joints["AnkleLeft"][1],
-                                                         joints["FootLeft"][0],
-                                                         joints["FootLeft"][2],
-                                                         joints["FootLeft"][1])
+                                                       joints["KneeLeft"][2],
+                                                       joints["KneeLeft"][1],
+                                                       joints["AnkleLeft"][0],
+                                                       joints["AnkleLeft"][2],
+                                                       joints["AnkleLeft"][1],
+                                                       joints["FootLeft"][0],
+                                                       joints["FootLeft"][2],
+                                                       joints["FootLeft"][1])
     return {"angles": listAngles, "supportLeg": support_leg}

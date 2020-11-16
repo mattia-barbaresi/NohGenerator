@@ -1,7 +1,6 @@
 import motion
 from naoqi import ALProxy
-
-from common import constants
+from nao_libs.common import constants
 
 
 def StiffnessOn(proxy):
@@ -17,12 +16,12 @@ def bend_down(t):
     PORT = constants.PORT
     try:
         try:
-            motionProxy = ALProxy("ALMotion", robotIP, PORT)  # creates proxy to call specific functions
+            motionProxy = ALProxy("ALMotion", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to AlMotion"
             print "Error was: ", e
         try:
-            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT)  # creates proxy to call specific functions
+            postureProxy = ALProxy("ALRobotPosture", robotIP, PORT) #creates proxy to call specific functions
         except Exception, e:
             print "Could not create proxy to ALRobotPosture"
             print "Error was: ", e
@@ -49,13 +48,13 @@ def bend_down(t):
         isAbsolute = False
 
         motionProxy.positionInterpolations(effectorList, space, pathList,
-                                           axisMask, timeList, isAbsolute)
+                                          axisMask, timeList, isAbsolute)
         # motionProxy.setPositions(chainName, frame, position, fractionMaxSpeed, axisMask)
-    except Exception as e:  # checks for any and all errors
-        print "error here ", e
-        # ignores every single one of them, except keyboardInterupt and SystemExit
-    except (KeyboardInterrupt, SystemExit):  # when the program gets terminated
+    except Exception as e: # checks for any and all errors
+        print "error here " , e
+         # ignores every single one of them, except keyboardInterupt and SystemExit
+    except (KeyboardInterrupt, SystemExit): # when the program gets terminated
         print("error program terminated")
-        postureProxy.goToPosture("StandInit", 0.5)  # set the robot in its initial position
-        motionProxy.setStiffnesses("Body", 1.0)  # stiffen the joints
-        raise  # actually quit
+        postureProxy.goToPosture("StandInit", 0.5) # set the robot in its initial position
+        motionProxy.setStiffnesses("Body", 1.0) # stiffen the joints
+        raise #actually quit
