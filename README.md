@@ -25,5 +25,5 @@
 - ##### nao_libs
     Contains library for converting mocap data joint angles into a json format for Nao
 
-- ##### plots
+- ##### utils
     Lib for plotting results
