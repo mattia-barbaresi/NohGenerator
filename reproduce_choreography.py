@@ -1,18 +1,18 @@
 import os
 
-import json_editor
+from genetic_algorithm import constants, json_editor
 from nao_libs.common import sendToRobot, MoveForward, MoveBackward, Rotate
 
 
 def read_and_move(filename, t):
-    list_angles = json_editor.read_dict(filename)
+    print "filename: " + filename
+    list_angles = json_editor.read_dict(
+        os.path.dirname(os.path.abspath(__file__)).rsplit("/")[0] + "/" + filename)
     sendToRobot.sendrobot(list_angles, t)
 
 
 def reproduce(sequence):
     t = 1
-    list_of_moves = json_editor.read_dict_reproduce("./data/archive/LIST_OF_MOVES")
-    print list_of_moves
     sendToRobot.initialize()
     for pose in sequence:
         # print Constants.LIST_OF_MOVES[x]
@@ -25,10 +25,10 @@ def reproduce(sequence):
         elif pose == "w":
             Rotate.rotate_right(t)
         else:
-            read_and_move(list_of_moves[pose], t)
+            read_and_move(constants.LIST_OF_MOVES[pose], t)
 
 
-os.chdir("../")
+os.chdir("/")
 reproduce("awhzsnxpyabtxdjj")
 # reproduce("abcdefghijklmnopqrstuvwxyz")
 frequency = 2500  # Set Frequency To 2500 Hertz

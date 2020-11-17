@@ -1,5 +1,5 @@
 import math
-from plots import trigo
+from utils import trigo
 
 
 def calculateKneePitch(x1, y1, z1, #1 is the hip position
