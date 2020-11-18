@@ -4,10 +4,10 @@ from datetime import datetime
 from numpy import average
 from pandas import DataFrame
 
-import json_editor
 import random_individuals
 import ritchie_criteria
 from evaluation import *
+from genetic_algorithm import constants, json_editor
 from sbc import *
 
 alpha = 0.5
@@ -53,11 +53,11 @@ nov_total = {}
 
 def calculate_fitness_generations(path):
     gens = 0
-    with open(os.path.join(path, "generations_serialized")) as fp:
-        for ln in fp:
+    with open(os.path.join(path, "generations_serialized")) as mf:
+        for ln in mf:
             if "fitness" in ln:
                 gens = gens + 1
-    fp.close()
+    mf.close()
     return gens
 
 
@@ -80,7 +80,7 @@ for path, subdirs, files in os.walk(root):
             len_res_full.append(results_length)
             fp.close()
 
-            eval = {}
+            tot_eval = {}
             avg_eval = 0
             n = 0
             count = 0
@@ -102,12 +102,12 @@ for path, subdirs, files in os.walk(root):
             fp.close()
 
             # read results dict
-            results_fitness_and_novelty = json_editor.read_dict(os.path.join(path, "results"))
+            results_dict = json_editor.read_dict(os.path.join(path, "results"))
             fit = []
             ncd_local = []
             string_rep = concatenate_items_to_string(repertoire)
             nov_local = []
-            for x in results_fitness_and_novelty["results"]:
+            for x in results_dict["results"]:
                 results_complete.append(x["ind"])
                 avg_fit_results = avg_fit_results + x["value"][0]
                 fit.append(x["value"][0])
@@ -133,31 +133,32 @@ for path, subdirs, files in os.walk(root):
 
             string_res = create_string_results(results_complete)
             string_res_total.append(string_res)
-            eval[string_res] = compute_ncd(string_res, string_rep)
-            ncd_full.append(eval[string_res])
+            tot_eval[string_res] = compute_ncd(string_res, string_rep)
+            ncd_full.append(tot_eval[string_res])
             len_repertoire.append(repertoire_length)
-            ngen.append(results_fitness_and_novelty["parameters"]["generations"])
-            tmin.append(results_fitness_and_novelty["parameters"]["t_min "])
-            fit_thres_ful.append(results_fitness_and_novelty["parameters"]["fitness_threshold"])
-            diss_thres_ful.append(results_fitness_and_novelty["parameters"]["dissim_threshold"])
-            eval["average_typicality Criterion1"] = crit1
+            ngen.append(results_dict["parameters"]["generations"])
+            tmin.append(results_dict["parameters"]["t_min "])
+            fit_thres_ful.append(results_dict["parameters"]["fitness_threshold"])
+            diss_thres_ful.append(results_dict["parameters"]["dissim_threshold"])
+            tot_eval["average_typicality Criterion1"] = crit1
             avg_typ.append(crit1)
-            eval["min_typicality"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
+            tot_eval["min_typicality"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
                                                                                        repertoire=repertoire)
             min_typ_total["alg"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
                                                                                      repertoire=repertoire)
-            min_typ.append(average(eval["min_typicality"]))
-            eval["criterion2"] = crit2
+            min_typ.append(average(tot_eval["min_typicality"]))
+            tot_eval["criterion2"] = crit2
 
             crit_2_total.append(crit2)
             index1.append(path.split("\\")[1])
             index2.append(path.split("\\")[2])
-            # jsonEditor.dumpDict(os.path.join(path, filename), eval)
+            # jsonEditor.dumpDict(os.path.join(path, filename), tot_eval)
             # here I have all the directories with results
 
             # archive part
-            results_complete_archive = json_editor.read_dict(os.path.join(path, "res_arch"))
-            print "res: " + str("novelty" in path)
+            results_complete_archive = 0
+            if results_dict["evaluation_method"] != "fitness":
+                results_complete_archive = json_editor.read_dict(os.path.join(path, "res_arch"))
             if ("novelty" in path) and len(results_complete_archive.values()) > 0:
                 results_archive = []
                 avg_fit_archive = 0
@@ -197,7 +198,8 @@ for path, subdirs, files in os.walk(root):
                 full_ncd_archive_total.append(compute_ncd(archive_string_complete, string_rep))
                 len_Arch_full.append(len(results_complete_archive.values()))
             else:
-                print "WARNING - no archive found in path: " + path
+                if "novelty" in path:
+                    print "WARNING - no archive found in path: " + path
                 fitness_archive_total.append("")
                 full_ncd_archive_total.append("")
                 criterion1_archive_total.append("")
@@ -212,7 +214,7 @@ for path, subdirs, files in os.walk(root):
             ncd_local = []
             sbc_rnd = []
             for x in range(results_length):
-                ind = random_individuals.init_individual()
+                ind = random_individuals.init_individual(constants.NUMBER_OF_MOVES, constants.LIST_OF_MOVES.keys())
                 rand_ind = rand_ind + "".join(ind)
                 sbc_rnd.append("".join(ind))
                 rand_ind_list.append(ind)
@@ -232,9 +234,9 @@ for path, subdirs, files in os.walk(root):
                                                                                         repertoire=repertoire)
             min_typ.append(average(
                 calculate_typicality_with_min_distance_from_files(results=rand_ind_list, repertoire=repertoire)))
-            crit1rand = ritchie_criteria.compute_criterion_1(results=rand_ind_list, string_repertoire=string_rep)
-            crit2rand = ritchie_criteria.compute_criterion_2(results=rand_ind_list, string_repertoire=string_rep,
-                                                             alpha=0.5)
+            crit_1_rand = ritchie_criteria.compute_criterion_1(results=rand_ind_list, string_repertoire=string_rep)
+            crit_2_rand = ritchie_criteria.compute_criterion_2(results=rand_ind_list, string_repertoire=string_rep,
+                                                               alpha=0.5)
             evaluation_random_average = 0
             fit = []
             for ind in rand_ind_list:
@@ -247,8 +249,8 @@ for path, subdirs, files in os.walk(root):
                 fit.append(evaluation_rand)
             all_results["random"] = fit
             evaluation_random_average = evaluation_random_average / len(rand_ind)
-            avg_typ.append(crit1rand)
-            crit_2_total.append(crit2rand)
+            avg_typ.append(crit_1_rand)
+            crit_2_total.append(crit_2_rand)
             avg_fit_total.append(evaluation_random_average)
             len_res_full.append(results_length)
             tmin.append("")

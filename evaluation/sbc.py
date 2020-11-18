@@ -27,7 +27,21 @@ def compute_sbc(path):
         sbc = SBC("bz2", "9", res)
         return sbc.compute()
     else:
-        print "path excluded (only one line found): " + path
+        print "SBC (path excluded): " + path
+        return -1
+
+
+def compute_sbc_from_pop(pop):
+    pop_list = []
+    count = 0
+    for ind in pop:
+        pop_list.append("".join(ind))
+        count += 1
+    if count > 1:
+        sbc = SBC("bz2", "9", pop_list)
+        return sbc.compute()
+    else:
+        print "SBC (pop excluded): " + str(pop_list)
         return -1
 
 

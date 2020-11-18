@@ -1,48 +1,54 @@
 import random
 import bcolors
-import json_editor
 from deap import base, creator, tools
 from evaluation.evaluation import compute_ncd
 from evaluation.ritchie_criteria import compute_criterion_1, compute_criterion_2
-from evaluation.sbc import SBC
-from genetic_algorithm import fitness_novelty as Operations, constants, file_management
-from plots.plot2d import plot2d, plot2d_2_series, plot2d_no_lim
+from evaluation.sbc import compute_sbc_from_pop
+from genetic_algorithm import genetic_operations, constants, file_management, json_editor
+from utils.plot2d import plot2d, plot2d_2_series, plot2d_no_lim
 
 
-def calculate_fitnesses(ind, pop, toolbox, parameters):
+# alias for ga ops: only fitness
+def calculate_fitness(ind, pop, toolbox, parameters):
     try:
         return toolbox.evaluate(ind, parameters)
     except Exception as e:
-        print "fitness"
+        print "fitness error"
         print e
 
 
+# alias for ga ops: only novelty
 def calculate_novelty(ind, pop, toolbox, parameters):
+    try:
+        return toolbox.evaluate_novelty(ind, pop, parameters)
+    except Exception as e:
+        print "novelty error"
+        print e
+
+
+# alias for ga ops: hybrid
+def calculate_hybrid(ind, pop, toolbox, parameters):
     try:
         return toolbox.evaluate_hybrid(ind, pop, parameters)
     except Exception as e:
-        print "novelty"
+        print "hybrid error"
         print e
 
 
-def print_pop(pop):
-    for x in pop:
-        print "".join(x), x.fitness.values
-
-
-
 def create_choreography(parameters):
-    # initialization
-    fitness_function = calculate_fitnesses
-    # evaluation_method: 0 fitness, 1 novelty, 2 both
+
+    # init
+    fitness_function = calculate_fitness
     if parameters.evaluation_method_index == 1:
         fitness_function = calculate_novelty
 
+    # init random
     random.seed(parameters.random_seed)
 
-    # clear archive
-    file_management.clearArchive()
-    file_management.initres(parameters.full_name)
+    # init archive
+    if parameters.evaluation_method_index != 0:
+        parameters.archive = []
+        file_management.init_res_arch(parameters.full_name)
 
     # init DEAP fitness and individual for tournament in novelty search
     if hasattr(creator, "FitnessMaxTN"):
@@ -60,103 +66,93 @@ def create_choreography(parameters):
 
     # DEAP toolbox and registration
     toolbox = base.Toolbox()
-    toolbox.register("individual", tools.initIterate, creator.Individual, Operations.init_individual)
+    toolbox.register("individual", tools.initIterate, creator.Individual, genetic_operations.init_random)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-    toolbox.register("evaluate", Operations.calculate_fitness)
-    toolbox.register("evaluate_hybrid", Operations.calculate_fitness_and_novelty)
-    toolbox.register("mutate", Operations.mutation)
+    toolbox.register("evaluate", genetic_operations.calculate_fitness)
+    toolbox.register("evaluate_novelty", genetic_operations.calculate_novelty)
+    toolbox.register("evaluate_hybrid", genetic_operations.calculate_fitness_and_novelty)
+    toolbox.register("mutate", genetic_operations.mutation)
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("selectspea2", tools.selSPEA2, k=constants.POPULATION_SIZE / 10)
+    # for novelty tournament
     toolbox.register("selectTournament", tools.selTournament, k=constants.POPULATION_SIZE / 10, tournsize=5)
 
-    # init the counter of individuals with fitness over threshold over to 0
-    count_individuals = 0
+    # string encoding of repertoire
     repertoire_string = ""
     for x in file_management.getRepertoireWithPath(parameters.repertoire_path)["repertoire"]:
         repertoire_string = repertoire_string + "".join(x["choreo"])
 
+    # create the population
+    pop = toolbox.population(n=constants.POPULATION_SIZE)
+    print "init population done"
+
+    generations = []
+    archive_size = {}
     full_ncd_results = {}
     full_sbc_results = {}
     criterion_1 = {}
     criterion_2 = {}
-    fitnesses_avg = {}
+    fitness_avg = {}
     novelty_avg = {}
-    archive_size = {}
-
-    # create the population
-    pop = toolbox.population(n=constants.POPULATION_SIZE)
-    print "population done"
-
-    # Begin the evolution
+    count_individuals = 0
+    parents = []
     g = 0
-    # print(bcolors.BLUE + "initialization" + bcolors.ENDC)
-    print "initialization"
-    generations = []
+
     for g in range(parameters.number_of_generations):
-        # while g < parameters.number_of_generations or
-        # (fitness_function == calculate_fitnesses and not parameters.evaluation_method_index == 0):
-        # A new generation
-        g = g + 1
-        # print "generation", g
 
-        # switch function for evaluation
+        # switch function for hybrid evaluation
         if parameters.evaluation_method_index == 2:
-            if count_individuals >= constants.T_MAX and fitness_function == calculate_fitnesses:
-                fitness_function = calculate_novelty
-            elif count_individuals <= constants.T_MIN and fitness_function == calculate_novelty:
-                fitness_function = calculate_fitnesses
-        if fitness_function == calculate_novelty:
-            # print "novelty"
-            print bcolors.OKMSG + "novelty" + bcolors.ENDC
-            generations.append("novelty")
-        else:
-            # print "fitness"
-            print bcolors.ERRMSG + "fitness" + bcolors.ENDC
-            generations.append("fitness")
+            if count_individuals >= constants.T_MAX and fitness_function == calculate_fitness:
+                fitness_function = calculate_hybrid
+            elif count_individuals <= constants.T_MIN and fitness_function == calculate_hybrid:
+                fitness_function = calculate_fitness
 
+        # save used method
+        if fitness_function == calculate_fitness:
+            # print "fitness"
+            # print bcolors.PASS + "fitness" + bcolors.ENDC
+            generations.append("fitness")
+        elif fitness_function == calculate_novelty:
+            # print "novelty"
+            # print bcolors.WARN + "novelty" + bcolors.ENDC
+            generations.append("novelty")
+        elif fitness_function == calculate_hybrid:
+            # print "hybrid"
+            # print bcolors.ERR + "hybrid" + bcolors.ENDC
+            generations.append("hybrid")
+        else:
+            print "FATAL ERROR: NO METHOD FOUND"
         # evaluate the offspring
+        # and count individual above threshold
         count_individuals = 0
         for ind in pop:
             ind.fitness.values = fitness_function(ind, pop, toolbox, parameters)
             if ind.fitness.values[0] > parameters.fitness_threshold:
                 count_individuals = count_individuals + 1
-        archive_size[g] = len(file_management.getArchive()["archive"])
+
+        archive_size[g] = len(parameters.archive)
 
         # selection
-        if parameters.evaluation_method_index == 2:
-            if fitness_function == calculate_fitnesses:
-                parents = toolbox.selectTournament(pop)
-            else:
-                parents = toolbox.selectspea2(pop)
-        elif parameters.evaluation_method_index == 1:
-            parents = toolbox.selectspea2(pop)
-        else:
-            parents = toolbox.selectTournament(pop)
+        parents = toolbox.selectspea2(pop)
 
         # stats
+
         results_full = ""
         avg_nov_local = 0
         avg_fit_local = 0
         for x in parents:
             results_full = results_full + "".join(x)
-            if fitness_function == calculate_novelty:
-                avg_nov_local = avg_nov_local + x.fitness.values[1]
             avg_fit_local = avg_fit_local + x.fitness.values[0]
-        avg_fit_local = avg_fit_local / 10
-        avg_nov_local = avg_nov_local / 10
-        if fitness_function == calculate_novelty:
-            novelty_avg[g] = avg_nov_local
-        fitnesses_avg[g] = avg_fit_local
+            if parameters.evaluation_method_index != 0:
+                avg_nov_local = avg_nov_local + x.fitness.values[1]
+
+        fitness_avg[g] = avg_fit_local / 10
+        if parameters.evaluation_method_index != 0:
+            novelty_avg[g] = avg_nov_local / 10
 
         # evaluate metrics
-
         # sbc
-        res_list = []
-        for x in parents:
-            res_list.append("".join(x))
-        sbc = SBC("bz2", "9", res_list)
-        full_sbc_results[g] = sbc.compute()  # sbc of generation
-
+        full_sbc_results[g] = compute_sbc_from_pop(parents)  # sbc of generation
         # ncd
         full_ncd_results[g] = compute_ncd(results_full, repertoire_string)
         criterion_1[g] = compute_criterion_1(list(map(toolbox.clone, parents)), repertoire_string)
@@ -186,57 +182,22 @@ def create_choreography(parameters):
                 del mutant.fitness.values
 
         # create the new offspring with old population and new individuals
+        # tot = 10 + 90
         pop = parents + new
+    # -----------------
 
-    # last evaluation
-    for ind in pop:
-        ind.fitness.values = fitness_function(ind, pop, toolbox, parameters)
-
-    # last selection
+    # plot fitness and novelty avgs
     if parameters.evaluation_method_index == 2:
-        if fitness_function == calculate_fitnesses:
-            final = toolbox.selectTournament(pop)
-        else:
-            final = toolbox.selectspea2(pop)
-    elif parameters.evaluation_method_index == 1:
-        final = toolbox.selectspea2(pop)
-    else:
-        final = toolbox.selectTournament(pop)
-    results_full = ""
-
-    # plots results
-    avg_nov_local = 0
-    avg_fit_local = 0
-    for x in final:
-        results_full = results_full + "".join(x)
-        if fitness_function == calculate_novelty:
-            avg_nov_local = avg_nov_local + x.fitness.values[1]
-        avg_fit_local = avg_fit_local + x.fitness.values[0]
-    avg_fit_local = avg_fit_local / 10
-    avg_nov_local = avg_nov_local / 10
-    if fitness_function == calculate_novelty:
-        novelty_avg[g] = avg_nov_local
-    fitnesses_avg[g] = avg_fit_local
-    if fitness_function == calculate_novelty:
-        plot2d_2_series(data=fitnesses_avg, data2=novelty_avg, x_label="generation", y_label="fitness and novelty",
+        plot2d_2_series(data=fitness_avg, data2=novelty_avg, x_label="generation", y_label="fitness and novelty",
                         path=parameters.full_name + "values")
+    elif parameters.evaluation_method_index == 1:
+        plot2d(data=novelty_avg, x_label="generation", y_label="novelty", path=parameters.full_name + "values")
     else:
-        plot2d(data=fitnesses_avg, x_label="generation", y_label="fitness", path=parameters.full_name + "values")
-    archive_size[g] = len(file_management.getArchive()["archive"])
-    plot2d_no_lim(data=archive_size, x_label="generation", y_label="archive size",
-                  path=parameters.full_name + "archivesize")
-
-    # last metrics
-
-    res_list = []
-    # sbc of last gen
-    for x in final:
-        res_list.append("".join(x))
-    sbc = SBC("bz2", "9", res_list)
-    full_sbc_results[g] = sbc.compute()  # sbc of generation
-    full_ncd_results[g] = compute_ncd(results_full, repertoire_string)
-    criterion_1[g] = compute_criterion_1(list(map(toolbox.clone, final)), repertoire_string)
-    criterion_2[g] = compute_criterion_2(list(map(toolbox.clone, final)), repertoire_string, 0.5)
+        plot2d(data=fitness_avg, x_label="generation", y_label="fitness", path=parameters.full_name + "values")
+    # plot archive size
+    if parameters.evaluation_method_index != 0:
+        plot2d_no_lim(data=archive_size, x_label="generation", y_label="archive size",
+                      path=parameters.full_name + "archivesize")
 
     # plots
     plot2d(data=full_sbc_results, x_label="generation", y_label="sbc", path=parameters.full_name + "sbc")
@@ -253,11 +214,16 @@ def create_choreography(parameters):
     json_editor.dump_dict(filename=parameters.full_name + "criterion_1", dictionary=criterion_1)
     json_editor.dump_dict(filename=parameters.full_name + "criterion_2", dictionary=criterion_2)
     json_editor.dump_dict(filename=parameters.full_name + "criterion_2", dictionary=criterion_2)
-    json_editor.dump_dict(filename=parameters.full_name + "archivesize", dictionary=archive_size)
+
+    # save archive
+    if parameters.evaluation_method_index != 0:
+        json_editor.dump_dict(filename=parameters.full_name + "archivesize", dictionary=archive_size)
+
+    # save values
     json_editor.dump_dict(filename=parameters.full_name + "values",
-                          dictionary={"fitness": fitnesses_avg,
+                          dictionary={"fitness": fitness_avg,
                                       "novelty": novelty_avg,
                                       "sbc": full_sbc_results,
                                       "ncd": full_ncd_results})
 
-    return final, generations
+    return parents, generations

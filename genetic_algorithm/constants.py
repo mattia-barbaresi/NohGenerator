@@ -17,7 +17,6 @@ POPULATION_SIZE = 100
 MUTPB = 0.35
 
 # paths
-ARCHIVE_PATH = "data/archive/archive"
 REPERTOIRE_PATH = [
     "data/archive/repertoire1",
     "data/archive/repertoire2",
@@ -28,9 +27,7 @@ REPERTOIRE_PATH = [
     "data/archive/repertoire5",
     "data/archive/repertoire10"
 ]
-RANDOM_PATH = "data/archive/random"
 
-# LIST_OF_MOVES = jsonEditor.readDict("./data/archive/LIST_OF_MOVES")
 LIST_OF_MOVES = {
     "a": "data/poses/armsdown",
     "b": "data/poses/swordright",

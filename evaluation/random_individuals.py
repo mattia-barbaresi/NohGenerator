@@ -10,7 +10,3 @@ def init_individual(n, lst):
         moves_list.append(move)
     return moves_list
 
-    # save in file
-    # for x in range(100):
-    #     with open("data/archive/random", "a") as myfile:
-    #         myfile.write("\n"  + str("".join(init_individual())))
