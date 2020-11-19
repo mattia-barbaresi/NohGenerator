@@ -1,4 +1,4 @@
-from evaluation import compute_ncd, create_string_repertoire, create_string_results
+from evaluation import compute_ncd, create_string_repertoire, create_string
 
 
 def calculate_ratio(x, y):
@@ -13,7 +13,7 @@ def calculate_av_typ(x, repertoire):
 
 
 def calculate_typicality(results, repertoire):
-    results_string = create_string_results(results)
+    results_string = create_string(results)
     repertoire_string = create_string_repertoire(repertoire)
     ncd = compute_ncd(results_string, repertoire_string)
     return ncd

@@ -38,7 +38,6 @@ diss_thres_ful = []
 len_res_full = []
 gen_fitness_total = []
 string_res_total = []
-
 fitness_archive_total = []
 full_ncd_archive_total = []
 criterion1_archive_total = []
@@ -63,35 +62,29 @@ def calculate_fitness_generations(path):
 
 for path, subdirs, files in os.walk(root):
 
+    # results part
     for name in files:
         if "results_serialized" in name:
-            # results part
             results_serialized = []
             results_length = 0
-            # if "and" not in path:
-            #     name_results = "results_serialized"
-
             with open(os.path.join(path, name)) as fp:
                 for line in fp:
                     if line != "\n":
                         results_length = results_length + 1
-                    results_serialized.append(line[:-1])
+                        results_serialized.append(line[:-1])
             # print results
             len_res_full.append(results_length)
             fp.close()
 
             tot_eval = {}
-            avg_eval = 0
             n = 0
-            count = 0
             avg_fit_results = 0
             avg_nov = 0
             results_complete = []
             repertoire = []
             repertoire_length = 0
             # calculate fitness generations
-            gen_fitness = calculate_fitness_generations(path=path)
-            gen_fitness_total.append(gen_fitness)
+            gen_fitness_total.append(calculate_fitness_generations(path=path))
 
             # open the repertoire
             with open(os.path.join(path, "repertoire_serialized")) as fp:
@@ -105,14 +98,14 @@ for path, subdirs, files in os.walk(root):
             results_dict = json_editor.read_dict(os.path.join(path, "results"))
             fit = []
             ncd_local = []
-            string_rep = concatenate_items_to_string(repertoire)
+            string_rep = create_string(repertoire)
             nov_local = []
             for x in results_dict["results"]:
                 results_complete.append(x["ind"])
                 avg_fit_results = avg_fit_results + x["value"][0]
                 fit.append(x["value"][0])
                 ncd_local.append(compute_ncd("".join(x["ind"]), string_rep))
-                if "and" in path:
+                if "novelty" in path:
                     avg_nov = avg_nov + x["value"][1]
                     nov_local.append(x["value"][1])
             all_results["alg"] = fit
@@ -131,7 +124,7 @@ for path, subdirs, files in os.walk(root):
             sbc_rep.append(compute_sbc(os.path.join(path, "repertoire_serialized")))
             sbc_res.append(compute_sbc(os.path.join(path, "results_serialized")))
 
-            string_res = create_string_results(results_complete)
+            string_res = create_string(results_complete)
             string_res_total.append(string_res)
             tot_eval[string_res] = compute_ncd(string_res, string_rep)
             ncd_full.append(tot_eval[string_res])
@@ -143,7 +136,7 @@ for path, subdirs, files in os.walk(root):
             tot_eval["average_typicality Criterion1"] = crit1
             avg_typ.append(crit1)
             tot_eval["min_typicality"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
-                                                                                       repertoire=repertoire)
+                                                                                           repertoire=repertoire)
             min_typ_total["alg"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
                                                                                      repertoire=repertoire)
             min_typ.append(average(tot_eval["min_typicality"]))
@@ -269,30 +262,30 @@ for path, subdirs, files in os.walk(root):
             len_Arch_full.append("")
 
 df = DataFrame({
-    '01_parameters': index1,
-    "02_method": index2,
-    "03_ncd_full": ncd_full,
-    "031_sbc_rep": sbc_rep,
-    "032_sbc_archive": sbc_archive,
-    "033_sbc_res": sbc_res,
-    '04_criterion 1': avg_typ,
-    '05_average min_typicality': min_typ,
-    "06_avg_fit": avg_fit_total,
-    '07_criterion 2 with ncd': crit_2_total,
-    "08_len_Arch": len_Arch_full,
-    "09_full ncd archive": full_ncd_archive_total,
-    "10_criterion 1 archive": criterion1_archive_total,
-    "11_ fitness archive average": fitness_archive_total,
-    "12_criterion 2 archive": criterion2_archive_total,
-    "13_average min typicality archive": average_min_typicality_archive_total,
-    "14_gen_fitness": gen_fitness_total,
-    "15_average novelty": avg_nov_total,
-    "16_fit thresh": fit_thres_ful,
-    "17_diss thresh": diss_thres_ful,
-    "18_ngen": ngen,
-    "19_tmin": tmin,
-    "20_lenrep": len_repertoire,
-    "21_len_res": len_res_full,
-    "22_string_res": string_res_total,
+    '01 parameters': index1,
+    "02 method": index2,
+    "03 ncd": ncd_full,
+    "04 sbc_res": sbc_res,
+    '05 criterion 1': avg_typ,
+    '06 average min_typicality': min_typ,
+    "07 avg_fit": avg_fit_total,
+    "08 avg_novelty": avg_nov_total,
+    "09 sbc_rep": sbc_rep,
+    "10 sbc_archive": sbc_archive,
+    '11 criterion 2 with ncd': crit_2_total,
+    "12 len_Arch": len_Arch_full,
+    "13 full ncd archive": full_ncd_archive_total,
+    "14 criterion 1 archive": criterion1_archive_total,
+    "15 fitness archive average": fitness_archive_total,
+    "16 criterion 2 archive": criterion2_archive_total,
+    "17 average min typicality archive": average_min_typicality_archive_total,
+    "18 gen_fitness": gen_fitness_total,
+    "19 fit thresh": fit_thres_ful,
+    "20 diss thresh": diss_thres_ful,
+    "21 ngen": ngen,
+    "22 tmin": tmin,
+    "23 lenrep": len_repertoire,
+    "24 len_res": len_res_full,
+    "25 string_res": string_res_total,
 })
 df.to_excel("../data/results/" + filename + ".xlsx", sheet_name='sheet1', index=False)

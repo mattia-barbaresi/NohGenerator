@@ -86,17 +86,17 @@ def create_choreography(parameters):
     pop = toolbox.population(n=constants.POPULATION_SIZE)
     print "init population done"
 
+    # init stats variables
     generations = []
     archive_size = {}
-    full_ncd_results = {}
-    full_sbc_results = {}
+    ncd_results = {}
+    sbc_results = {}
     criterion_1 = {}
     criterion_2 = {}
     fitness_avg = {}
     novelty_avg = {}
     count_individuals = 0
     parents = []
-    g = 0
 
     for g in range(parameters.number_of_generations):
 
@@ -109,34 +109,32 @@ def create_choreography(parameters):
 
         # save used method
         if fitness_function == calculate_fitness:
-            # print "fitness"
             # print bcolors.PASS + "fitness" + bcolors.ENDC
             generations.append("fitness")
         elif fitness_function == calculate_novelty:
-            # print "novelty"
             # print bcolors.WARN + "novelty" + bcolors.ENDC
             generations.append("novelty")
         elif fitness_function == calculate_hybrid:
-            # print "hybrid"
             # print bcolors.ERR + "hybrid" + bcolors.ENDC
             generations.append("hybrid")
         else:
             print "FATAL ERROR: NO METHOD FOUND"
+
         # evaluate the offspring
-        # and count individual above threshold
+        # and count individuals above threshold
         count_individuals = 0
         for ind in pop:
             ind.fitness.values = fitness_function(ind, pop, toolbox, parameters)
             if ind.fitness.values[0] > parameters.fitness_threshold:
                 count_individuals = count_individuals + 1
 
+        # save archive size
         archive_size[g] = len(parameters.archive)
 
         # selection
         parents = toolbox.selectspea2(pop)
 
         # stats
-
         results_full = ""
         avg_nov_local = 0
         avg_fit_local = 0
@@ -151,19 +149,17 @@ def create_choreography(parameters):
             novelty_avg[g] = avg_nov_local / 10
 
         # evaluate metrics
-        # sbc
-        full_sbc_results[g] = compute_sbc_from_pop(parents)  # sbc of generation
-        # ncd
-        full_ncd_results[g] = compute_ncd(results_full, repertoire_string)
+        sbc_results[g] = compute_sbc_from_pop(parents)
+        ncd_results[g] = compute_ncd(results_full, repertoire_string)
         criterion_1[g] = compute_criterion_1(list(map(toolbox.clone, parents)), repertoire_string)
         criterion_2[g] = compute_criterion_2(list(map(toolbox.clone, parents)), repertoire_string, 0.5)
 
         # Clone the selected individuals
         offspring = list(map(toolbox.clone, parents))
-        # new individuals of the population
-        new = []
 
         # crossover
+        # new individuals of the population
+        new = []
         i = 0
         for child1 in offspring:
             for child2 in offspring:
@@ -181,8 +177,7 @@ def create_choreography(parameters):
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        # create the new offspring with old population and new individuals
-        # tot = 10 + 90
+        # create the new offspring with old population and new individuals (tot = 10 + 90)
         pop = parents + new
     # -----------------
 
@@ -194,36 +189,36 @@ def create_choreography(parameters):
         plot2d(data=novelty_avg, x_label="generation", y_label="novelty", path=parameters.full_name + "values")
     else:
         plot2d(data=fitness_avg, x_label="generation", y_label="fitness", path=parameters.full_name + "values")
+
     # plot archive size
     if parameters.evaluation_method_index != 0:
         plot2d_no_lim(data=archive_size, x_label="generation", y_label="archive size",
-                      path=parameters.full_name + "archivesize")
+                      path=parameters.full_name + "archive_size")
 
     # plots
-    plot2d(data=full_sbc_results, x_label="generation", y_label="sbc", path=parameters.full_name + "sbc")
-    plot2d(data=full_ncd_results, x_label="generation", y_label="ncd_full", path=parameters.full_name + "ncd_full")
+    plot2d(data=sbc_results, x_label="generation", y_label="sbc", path=parameters.full_name + "sbc")
+    plot2d(data=ncd_results, x_label="generation", y_label="ncd", path=parameters.full_name + "ncd")
     plot2d(data=criterion_1, x_label="generation", y_label="criterion_1", path=parameters.full_name + "criterion_1")
     plot2d(data=criterion_2, x_label="generation", y_label="criterion_2", path=parameters.full_name + "criterion_2")
-    plot2d_2_series(data=full_sbc_results, data2=full_ncd_results, x_label="generation", y_label="sbc_ncd",
+    plot2d_2_series(data=sbc_results, data2=ncd_results, x_label="generation", y_label="sbc_ncd",
                     path=parameters.full_name + "sbc_ncd")
     # plot2d_fit_nov(pop,final, parameters.full_name)
 
     # save results
-    json_editor.dump_dict(filename=parameters.full_name + "sbc", dictionary=full_sbc_results)
-    json_editor.dump_dict(filename=parameters.full_name + "ncd_full", dictionary=full_ncd_results)
+    json_editor.dump_dict(filename=parameters.full_name + "sbc", dictionary=sbc_results)
+    json_editor.dump_dict(filename=parameters.full_name + "ncd", dictionary=ncd_results)
     json_editor.dump_dict(filename=parameters.full_name + "criterion_1", dictionary=criterion_1)
-    json_editor.dump_dict(filename=parameters.full_name + "criterion_2", dictionary=criterion_2)
     json_editor.dump_dict(filename=parameters.full_name + "criterion_2", dictionary=criterion_2)
 
     # save archive
     if parameters.evaluation_method_index != 0:
-        json_editor.dump_dict(filename=parameters.full_name + "archivesize", dictionary=archive_size)
+        json_editor.dump_dict(filename=parameters.full_name + "archive_size", dictionary=archive_size)
 
     # save values
     json_editor.dump_dict(filename=parameters.full_name + "values",
                           dictionary={"fitness": fitness_avg,
                                       "novelty": novelty_avg,
-                                      "sbc": full_sbc_results,
-                                      "ncd": full_ncd_results})
+                                      "sbc": sbc_results,
+                                      "ncd": ncd_results})
 
     return parents, generations

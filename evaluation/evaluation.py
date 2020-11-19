@@ -14,23 +14,13 @@ def compute_ncd(a, b):
 def create_string_repertoire(vector):
     result = ""
     for x in vector:
-        # print x["choreo"]
         result = result + "".join(x["choreo"])
     return result
 
 
-def concatenate_items_to_string(vector):
+def create_string(vector):
     result = ""
     for x in vector:
-        # print x
-        result = result + "".join(x)
-    return result
-
-
-def create_string_results(vector):
-    result = ""
-    for x in vector:
-        # print x
         result = result + "".join(x)
     return result
 

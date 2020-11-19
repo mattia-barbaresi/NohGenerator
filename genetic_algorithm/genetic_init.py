@@ -1,6 +1,6 @@
 import os
 import time
-from evaluation.evaluation import create_string_results, create_string_repertoire, compute_ncd, \
+from evaluation.evaluation import create_string, create_string_repertoire, compute_ncd, \
     calculate_typicality_with_min_distance
 from evaluation.sbc import compute_sbc_from_pop
 from genetic_algorithm import deap_algorithm as deap_algorithm, constants, file_management
@@ -64,7 +64,7 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
 
     # read results and repertoire
     repertoire = file_management.getRepertoireWithPath(parameters.repertoire_path)["repertoire"]
-    results_string = create_string_results(pop)
+    results_string = create_string(pop)
     repertoire_string = create_string_repertoire(repertoire)
 
     # metrics

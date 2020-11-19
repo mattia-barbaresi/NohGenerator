@@ -33,8 +33,8 @@ def plot2d_2_series_from_path(path):
     else:
         plot2d_2_series(data, data2, path + "values_graph", "generations", "fitness and novelty")
 
-    data_read2 = json_editor.read_dict(path + "ncd_full")
-    plot2d(data_read2, path + "ncd_full", "generations", "ncd_full")
+    data_read2 = json_editor.read_dict(path + "ncd")
+    plot2d(data_read2, path + "ncd", "generations", "ncd")
     data_read3 = json_editor.read_dict(path + "criterion_1")
     plot2d(data_read3, path + "criterion_1", "generations", "criterion 1")
     data_read4 = json_editor.read_dict(path + "criterion_2")
