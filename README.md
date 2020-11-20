@@ -1,6 +1,6 @@
 # NohGenerator & IT metrics
 
-## Required packages
+## required packages
 
     matplotlib
     deap
@@ -9,7 +9,7 @@
     distance
     bcolors
 
-## Main Directories
+## main directories
 
 - ##### data
     moves archive, repertoires and results
