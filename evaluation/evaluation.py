@@ -8,7 +8,7 @@ def compute_ncd(a, b):
     ca = float(len(bz2.compress(a)))
     cb = float(len(bz2.compress(b)))
     cab = float(len(bz2.compress(a + b)))
-    return 1 - (cab - min(ca, cb)) / max(ca, cb)
+    return (cab - min(ca, cb)) / max(ca, cb)
 
 
 def create_string_repertoire(vector):
