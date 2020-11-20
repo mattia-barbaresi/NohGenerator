@@ -27,7 +27,7 @@ def compute_sbc(path):
         sbc = SBC("bz2", "9", res)
         return sbc.compute()
     else:
-        print "SBC (path excluded): " + path
+        print "(SBC, path excluded): " + path
         return -1
 
 
@@ -41,7 +41,7 @@ def compute_sbc_from_pop(pop):
         sbc = SBC("bz2", "9", pop_list)
         return sbc.compute()
     else:
-        print "SBC (pop excluded): " + str(pop_list)
+        print "(SBC, pop excluded): " + str(pop_list)
         return -1
 
 

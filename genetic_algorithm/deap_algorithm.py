@@ -84,7 +84,7 @@ def create_choreography(parameters):
 
     # create the population
     pop = toolbox.population(n=constants.POPULATION_SIZE)
-    print "init population done"
+    # print "init population done"
 
     # init stats variables
     generations = []
