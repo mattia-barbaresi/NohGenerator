@@ -1,5 +1,5 @@
-# NohGenerator
-## Noh choreographies generator & IT metrics
+# NohGenerator & IT metrics
+
 ## Required packages
 
     matplotlib
@@ -10,14 +10,15 @@
     bcolors
 
 ## Main Directories
+
 - ##### data
-    moves archive and results
+    moves archive, repertoires and results
+    
+- ##### evaluation
+    Evaluation and IT metrics
     
 - ##### genetic_algorithm
     the main directory of the project
-
-- ##### json_editor
-    Read and write json data
 
 - ##### nao_control
     Code for sending moves to the robot. It uses naoqi + CoppeliaSim robot simulator (simulated Nao)
@@ -26,4 +27,4 @@
     Contains library for converting mocap data joint angles into a json format for Nao
 
 - ##### utils
-    Lib for plotting results
+    Lib for plotting results and maths
