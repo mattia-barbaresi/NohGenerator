@@ -70,7 +70,7 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
     # metrics
     ncd = compute_ncd(results_string, repertoire_string)  # ncd
     sbc_t = compute_sbc_from_pop(pop)  # sbc of results
-    sbc_rep = compute_sbc_from_pop(repertoire)  # sbc of repertoire
+    sbc_rep = compute_sbc_from_pop(map(lambda x: x["choreo"], repertoire))  # sbc of repertoire
 
     # stats
     length = len(pop)
