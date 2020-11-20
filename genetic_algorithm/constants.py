@@ -23,8 +23,8 @@ REPERTOIRE_PATH = [
     "data/archive/repertoire3_priest",
     "data/archive/repertoire3_warrior",
     "data/archive/repertoire4",
-    "data/archive/repertoire6",
     "data/archive/repertoire5",
+    "data/archive/repertoire6",
     "data/archive/repertoire10"
 ]
 
