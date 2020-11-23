@@ -18,7 +18,7 @@
     Evaluation and IT metrics
     
 - ##### genetic_algorithm
-    the main directory of the project
+    directory of the GA implementation, using DEAP
 
 - ##### nao_control
     Code for sending moves to the robot. It uses naoqi + CoppeliaSim robot simulator (simulated Nao)
