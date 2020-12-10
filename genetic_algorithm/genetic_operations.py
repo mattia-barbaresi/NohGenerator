@@ -32,8 +32,7 @@ def archive_assessment(individual, evaluation,  parameters):
         if arch_len == 0 or arch_dissim > parameters.dissim_threshold:
             ml = "".join(individual)
             parameters.archive.append(ml)
-            # print "added to archive: " + ml
-            file_management.addres(x={"choreo": ml, "fitness": evaluation, "dissim": arch_dissim},
+            file_management.addres(x={"choreo": ml,"method_index": parameters.evaluation_method_index, "fitness": evaluation, "dissim": arch_dissim},
                                    path=parameters.full_name + "res_arch", index=arch_len)
 
 
