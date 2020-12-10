@@ -110,16 +110,16 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
     repertoire_file.close()
     gens_file.close()
 
-    sbc_arch = 0
-    archive = []
+    sbc_arch = 0.0
     # save archive (if method was not only fitness)
     if evaluation_method != "fitness":
+        # save archive
         archive_file = open(full_name + "archive_serialized", "w")
-        archive = parameters.archive
-        for element in archive:
+        for element in parameters.archive:
             print >> archive_file, element
         archive_file.close()
-        sbc_arch = compute_sbc_from_pop(archive)  # sbc of archive
+        # sbc of archive
+        sbc_arch = compute_sbc_from_pop(parameters.archive)
 
     params = {
         "generations": number_of_generations,
@@ -143,7 +143,7 @@ def init(number_of_generations, repertoire_index, evaluation_method_index, rando
         "sbc_res":sbc_t,
         "sbc_rep": sbc_rep,
         "sbc_arch":sbc_arch,
-        "archive": archive,
+        "archive": parameters.archive,
         "repertoire": repertoire,
         "min_distance": calculate_typicality_with_min_distance(parameters.repertoire_path, pop),
         "list_of_moves": constants.LIST_OF_MOVES,

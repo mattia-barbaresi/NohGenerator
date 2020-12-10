@@ -19,9 +19,9 @@ import zlib
 def compute_sbc(path):
     res = []
     count = 0
-    with open(path) as fp:
+    with open(path,"r") as fp:
         for line in fp:
-            res.append("".join(line))
+            res.append(line.replace('\n', ''))
             count += 1
     if count > 1:
         sbc = SBC("bz2", "9", res)
