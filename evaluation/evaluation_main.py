@@ -7,26 +7,25 @@ from pandas import DataFrame
 import random_individuals
 import ritchie_criteria
 from evaluation import *
-from genetic_algorithm import constants, json_editor
+from genetic_algorithm import constants
+from utils import json_editor
 from sbc import *
 
 alpha = 0.5
-now = datetime.now()
-filename = "results_" + now.strftime("%Y%m%d-%H.%M")
-root = "../data/results"
+dir_n = "65_80"
+root = "../data/results/" + dir_n
+filename = "results_" + dir_n + "_" + datetime.now().strftime("%Y%m%d-%H.%M")
+
 ncd_full = []
 sbc_rep = []
 sbc_archive = []
 sbc_res = []
-avg_typ = []
+crit_1_total = []
 min_typ = []
 crit_2_total = []
-crit_2_edited_total = []
 index1 = []
 index2 = []
 std = []
-max = []
-min = []
 mean = []
 avg_fit_total = []
 avg_nov_total = []
@@ -44,15 +43,12 @@ criterion1_archive_total = []
 criterion2_archive_total = []
 len_Arch_full = []
 average_min_typicality_archive_total = []
-min_typ_total = {}
-full_ncd_total = {}
 all_results = {}
-nov_total = {}
 
 
-def calculate_fitness_generations(path):
+def calculate_fitness_generations(fpath):
     gens = 0
-    with open(os.path.join(path, "generations_serialized")) as mf:
+    with open(os.path.join(fpath, "generations_serialized")) as mf:
         for ln in mf:
             if "fitness" in ln:
                 gens = gens + 1
@@ -61,8 +57,6 @@ def calculate_fitness_generations(path):
 
 
 for path, subdirs, files in os.walk(root):
-
-    # results part
     for name in files:
         if "results_serialized" in name:
             results_serialized = []
@@ -72,7 +66,6 @@ for path, subdirs, files in os.walk(root):
                     if line != "\n":
                         results_length = results_length + 1
                         results_serialized.append(line[:-1])
-            # print results
             len_res_full.append(results_length)
             fp.close()
 
@@ -84,7 +77,7 @@ for path, subdirs, files in os.walk(root):
             repertoire = []
             repertoire_length = 0
             # calculate fitness generations
-            gen_fitness_total.append(calculate_fitness_generations(path=path))
+            gen_fitness_total.append(calculate_fitness_generations(fpath=path))
 
             # open the repertoire
             with open(os.path.join(path, "repertoire_serialized")) as fp:
@@ -96,23 +89,19 @@ for path, subdirs, files in os.walk(root):
 
             # read results dict
             results_dict = json_editor.read_dict(os.path.join(path, "results"))
-            fit = []
-            ncd_local = []
             string_rep = create_string(repertoire)
+            fit = []
             nov_local = []
             for x in results_dict["results"]:
                 results_complete.append(x["ind"])
                 avg_fit_results = avg_fit_results + x["value"][0]
                 fit.append(x["value"][0])
-                ncd_local.append(compute_ncd("".join(x["ind"]), string_rep))
                 if "novelty" in path:
                     avg_nov = avg_nov + x["value"][1]
                     nov_local.append(x["value"][1])
             all_results["alg"] = fit
-            full_ncd_total["alg"] = ncd_local
             avg_fit_results = avg_fit_results / results_length
             avg_nov = avg_nov / results_length
-            nov_total["full"] = nov_local
 
             avg_fit_total.append(avg_fit_results)
             avg_nov_total.append(avg_nov)
@@ -121,34 +110,28 @@ for path, subdirs, files in os.walk(root):
                                                          alpha=0.5)
 
             # sbc
-            sbc_rep.append(compute_sbc(os.path.join(path, "repertoire_serialized")))
-            sbc_res.append(compute_sbc(os.path.join(path, "results_serialized")))
+            sbc_rep.append(results_dict["sbc_rep"])
+            sbc_res.append(results_dict["sbc_res"])
 
             string_res = create_string(results_complete)
             string_res_total.append(string_res)
-            tot_eval[string_res] = compute_ncd(string_res, string_rep)
-            ncd_full.append(tot_eval[string_res])
+
+            # ncd
+            ncd_full.append(results_dict["ncd"])
+
             len_repertoire.append(repertoire_length)
             ngen.append(results_dict["parameters"]["generations"])
             tmin.append(results_dict["parameters"]["t_min "])
             fit_thres_ful.append(results_dict["parameters"]["fitness_threshold"])
             diss_thres_ful.append(results_dict["parameters"]["dissim_threshold"])
-            tot_eval["average_typicality Criterion1"] = crit1
-            avg_typ.append(crit1)
-            tot_eval["min_typicality"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
-                                                                                           repertoire=repertoire)
-            min_typ_total["alg"] = calculate_typicality_with_min_distance_from_files(results=results_complete,
-                                                                                     repertoire=repertoire)
-            min_typ.append(average(tot_eval["min_typicality"]))
-            tot_eval["criterion2"] = crit2
-
+            crit_1_total.append(crit1)
+            min_typ.append(average(calculate_typicality_with_min_distance_from_files(
+                results=results_complete, repertoire=repertoire)))
             crit_2_total.append(crit2)
+            print path
             index1.append(path.split("\\")[1])
             index2.append(path.split("\\")[2])
-            # jsonEditor.dumpDict(os.path.join(path, filename), tot_eval)
-            # here I have all the directories with results
-
-            # archive part
+            # archive
             results_complete_archive = 0
             if results_dict["evaluation_method"] != "fitness":
                 results_complete_archive = json_editor.read_dict(os.path.join(path, "res_arch"))
@@ -161,7 +144,7 @@ for path, subdirs, files in os.walk(root):
                 nov_local = []
 
                 # sbc archive
-                sbc_archive.append(compute_sbc(os.path.join(path, "archive_serialized")))
+                sbc_archive.append(results_dict["sbc_arch"])
 
                 for x in results_complete_archive.values():
                     results_archive.append(["choreo"])
@@ -170,15 +153,9 @@ for path, subdirs, files in os.walk(root):
                     fitness_Arch.append(x["fitness"])
                     ncd_local.append(compute_ncd("".join(x["choreo"]), string_rep))
                     nov_local.append(x["dissim"])
-                nov_total["arch"] = nov_local
 
-                full_ncd_total["archive"] = ncd_local
                 all_results["archive"] = fitness_Arch
-                min_typ_total["archive"] = calculate_typicality_with_min_distance_from_files(
-                    results=results_archive, repertoire=repertoire)
-
                 avg_fit_archive = avg_fit_archive / len(results_complete_archive.values())
-
                 fitness_archive_total.append(avg_fit_archive)
                 average_min_typicality_archive_total.append(average(
                     calculate_typicality_with_min_distance_from_files(results=results_archive,
@@ -191,8 +168,6 @@ for path, subdirs, files in os.walk(root):
                 full_ncd_archive_total.append(compute_ncd(archive_string_complete, string_rep))
                 len_Arch_full.append(len(results_complete_archive.values()))
             else:
-                if "novelty" in path:
-                    print "WARNING - no archive found in path: " + path
                 fitness_archive_total.append("")
                 full_ncd_archive_total.append("")
                 criterion1_archive_total.append("")
@@ -213,7 +188,6 @@ for path, subdirs, files in os.walk(root):
                 rand_ind_list.append(ind)
                 ncd_local.append(compute_ncd("".join(ind), string_rep))
             index1.append(path.split("\\")[1])
-            full_ncd_total["random"] = ncd_local
 
             # sbc for random
             sbc = SBC("bz2", "9", sbc_rnd)
@@ -223,8 +197,6 @@ for path, subdirs, files in os.walk(root):
 
             index2.append("random")
             ncd_full.append(compute_ncd(rand_ind, string_rep))
-            min_typ_total["random"] = calculate_typicality_with_min_distance_from_files(results=rand_ind_list,
-                                                                                        repertoire=repertoire)
             min_typ.append(average(
                 calculate_typicality_with_min_distance_from_files(results=rand_ind_list, repertoire=repertoire)))
             crit_1_rand = ritchie_criteria.compute_criterion_1(results=rand_ind_list, string_repertoire=string_rep)
@@ -242,7 +214,7 @@ for path, subdirs, files in os.walk(root):
                 fit.append(evaluation_rand)
             all_results["random"] = fit
             evaluation_random_average = evaluation_random_average / len(rand_ind)
-            avg_typ.append(crit_1_rand)
+            crit_1_total.append(crit_1_rand)
             crit_2_total.append(crit_2_rand)
             avg_fit_total.append(evaluation_random_average)
             len_res_full.append(results_length)
@@ -266,7 +238,7 @@ df = DataFrame({
     "02 method": index2,
     "03 ncd": ncd_full,
     "04 sbc_res": sbc_res,
-    '05 criterion 1': avg_typ,
+    '05 criterion 1': crit_1_total,
     '06 average min_typicality': min_typ,
     "07 avg_fit": avg_fit_total,
     "08 avg_novelty": avg_nov_total,
@@ -289,3 +261,5 @@ df = DataFrame({
     "25 string_res": string_res_total,
 })
 df.to_excel("../data/results/" + filename + ".xlsx", sheet_name='sheet1', index=False)
+
+print "evaluation ended"

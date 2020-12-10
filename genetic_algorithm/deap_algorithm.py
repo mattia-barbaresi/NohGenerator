@@ -1,10 +1,10 @@
 import random
-import bcolors
 from deap import base, creator, tools
 from evaluation.evaluation import compute_ncd
 from evaluation.ritchie_criteria import compute_criterion_1, compute_criterion_2
 from evaluation.sbc import compute_sbc_from_pop
-from genetic_algorithm import genetic_operations, constants, file_management, json_editor
+from genetic_algorithm import genetic_operations, constants, file_management
+from utils import json_editor
 from utils.plot2d import plot2d, plot2d_2_series, plot2d_no_lim
 
 
@@ -42,7 +42,7 @@ def create_choreography(parameters):
     if parameters.evaluation_method_index == 1:
         fitness_function = calculate_novelty
 
-    # init random
+    # set random seed
     random.seed(parameters.random_seed)
 
     # init archive
@@ -177,7 +177,7 @@ def create_choreography(parameters):
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        # create the new offspring with old population and new individuals (tot = 10 + 90)
+        # create the new pop (tot = 10 + 90)
         pop = parents + new
     # -----------------
 

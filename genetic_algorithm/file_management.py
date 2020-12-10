@@ -1,5 +1,5 @@
 import genetic_algorithm.constants
-from genetic_algorithm import json_editor
+from utils import json_editor
 
 
 # todo refactor here

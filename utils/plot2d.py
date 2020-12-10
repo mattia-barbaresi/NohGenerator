@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from genetic_algorithm import json_editor
+from utils import json_editor
 
 
 def plot_2d_boxplot(data):

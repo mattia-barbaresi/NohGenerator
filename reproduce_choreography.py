@@ -1,11 +1,12 @@
 import os
 
-from genetic_algorithm import constants, json_editor
+from genetic_algorithm import constants
+from utils import json_editor
 from nao_libs.common import sendToRobot, MoveForward, MoveBackward, Rotate
 
 
 def read_and_move(filename, t):
-    print "filename: " + filename
+    print "figure: " + filename
     list_angles = json_editor.read_dict(
         os.path.dirname(os.path.abspath(__file__)).rsplit("/")[0] + "/" + filename)
     sendToRobot.sendrobot(list_angles, t)
@@ -29,7 +30,9 @@ def reproduce(sequence):
 
 
 os.chdir("/")
-reproduce("awhzsnxpyabtxdjj")
+chor = "awhzsnxpyabtxdjj"
+print "Reproducing... " + chor
+reproduce(chor)
 # reproduce("abcdefghijklmnopqrstuvwxyz")
 frequency = 2500  # Set Frequency To 2500 Hertz
 duration = 1000  # Set Duration To 1000 ms == 1 second
