@@ -7,15 +7,18 @@ import numpy as np
 
 
 # for colored console out
-class bcolors:
+class BColors:
+    def __init__(self):
+        pass
+
     HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
     RED = '\033[31m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
-    ENDC = '\033[0m'
+    END = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
@@ -82,7 +85,7 @@ def ngram_freq_per_line(mtx, order_limit=6):
     return dic
 
 
-# calculates transitional occurrences for markov models
+# calculates markov transitional occurrences
 def markov_trans_occ(mtx, order_limit=6):
     """This function computes transition occurrences dict up to order-limit
 
@@ -122,7 +125,7 @@ def markov_trans_occ(mtx, order_limit=6):
     return dic
 
 
-# calculates markov
+# calculates markov transitional frequencies
 def markov_trans_freq(mtx, order_limit=6):
     """This function computes transition frequencies dict up to order-limit
 
@@ -156,8 +159,8 @@ def markov_trans_freq(mtx, order_limit=6):
     return m
 
 
-# switch tokens in sequences with their transitional probabilities
-def detect_trans_probs(sequences, mtp):
+# switch tokens with their transitional probabilities in the given sequences
+def detect_transitions(sequences, mtp):
     """
     Read a list of sequences and switch each occurrence with its transitional probability.
 
@@ -220,12 +223,12 @@ def write_tp_seq(tps):
                 for x in item:
                     if x != "-":
                         rs = round(x, 2)
-                        clr = bcolors.OKGREEN
+                        clr = BColors.GREEN
                         if rs < 0.3:
-                            clr = bcolors.OKCYAN
+                            clr = BColors.CYAN
                         elif rs > 0.7:
-                            clr = bcolors.RED
-                        vl2 += clr + '(' + str(rs) + ')' + bcolors.ENDC + '\t'
+                            clr = BColors.RED
+                        vl2 += clr + '(' + str(rs) + ')' + BColors.END + '\t'
                         vl += '(' + str(round(x, 2)) + ')\t'
                     else:
                         vl2 += ' (' + x + ') \t'
