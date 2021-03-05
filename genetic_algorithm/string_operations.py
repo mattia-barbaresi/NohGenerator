@@ -1,5 +1,5 @@
-from distance import jaccard
 from pyjarowinkler import distance as jw
+from distance import jaccard
 
 
 # similar is 1
