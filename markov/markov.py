@@ -2,7 +2,6 @@
 
 import os
 import sys
-
 import numpy as np
 
 
@@ -11,16 +10,28 @@ class BColors:
     def __init__(self):
         pass
 
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
     CYAN = '\033[96m'
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    YELLOW = '\033[93m'
     GREEN = '\033[92m'
-    RED = '\033[31m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
+    RED = '\033[91m'
     END = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+
+
+# parameters
+class Params:
+    def __init__(self):
+        pass
+
+    TSH = 0.5
+
+
+def _key_selector(x):
+    '''
+    Select key for the sort function
+    '''
+    return len(x)
 
 
 # calculates frequency (occ./tot) of each ngram, as single set
@@ -101,8 +112,10 @@ def markov_trans_occ(mtx, order_limit=6):
     dic = dict()
     for order in range(order_limit):
         dic[order] = dict()
+        # init new dict for counting
+        m = dict()
         for arr in mtx:
-            m = dict()
+            # read and count n-grams in sequences
             for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
                 val = " ".join(str(e) for e in _ind)
                 val = val.strip()
@@ -110,6 +123,7 @@ def markov_trans_occ(mtx, order_limit=6):
                     m[val] = m[val] + 1
                 else:
                     m[val] = 1
+            # count last-word transitions in n-grams
             for tt in m.items():
                 t1 = (tt[0].split(" "))
                 if len(t1) > 1:
@@ -125,9 +139,9 @@ def markov_trans_occ(mtx, order_limit=6):
     return dic
 
 
-# calculates markov transitional frequencies
-def markov_trans_freq(mtx, order_limit=6):
-    """This function computes transition frequencies dict up to order-limit
+# calculates probabilities of markov transitions
+def markov_trans_prob(mtx, order_limit=6):
+    """This function computes conditional entropy dict up to order-limit
 
     ...
 
@@ -199,8 +213,110 @@ def detect_transitions(sequences, mtp):
     return res
 
 
+# chunking sequences
+def chunk_sequences(mtp, seqs, ord_max):
+    # ignore 0th-order
+    cl = dict()
+    # cl = set()
+    for order in range(1, ord_max):
+        cl[order] = set()
+        i = 0
+        for x in mtp[order]:
+            cks = ""
+            j = 0
+            while j < len(x):
+                if str(x[j]) == "-" or float(x[j]) >= Params.TSH:
+                    cks = cks + str(seqs[i][j])
+                else:
+                    if cks != "":
+                        cl[order].add(cks)
+                        # cl.add(cks)
+                        cks = str(seqs[i][j])
+                j = j + 1
+            if cks != "":
+                cl[order].add(cks)
+                # cl.add(cks)
+            i = i + 1
+    return cl
+
+
+# rewrite sequences with chunks
+def chunks_detection(seqs, chunks_dict):
+    # results
+    res = dict()
+    # for each order
+    for lvl in chunks_dict.items():
+        res[lvl[0]] = []
+        # convert set into list: computes indexes
+        s_dict = sorted(lvl[1], key=_key_selector)
+        print(s_dict)
+        # for word in res[item[0]]:
+        for sq in seqs:
+            # first char
+            search_str = ""
+            i = 0
+            while i < len(sq):
+                search_str = search_str + sq[i]
+                # search search_str in words bag
+                ind = -1
+                for w in s_dict:
+                    if w.find(search_str) == 0:
+                        ind = s_dict.index(w)
+                if ind > -1:
+                    # match
+                    match = s_dict[ind]
+                    res[lvl[0]].append(ind)
+                    search_str = ""
+                    i = i + len(match)
+                else:
+                    i = i + 1
+            if search_str != "":
+                res[lvl[0]].append(search_str)
+    print (res)
+
+
+# rewrite sequences with chunks
+def chunks_detection2(seqs, chunks_dict):
+    # results
+    res = dict()
+    app_set = set()
+    # create one array of words
+    for lvl in chunks_dict.items():
+        app_set = app_set | (lvl[1])
+    s_dict = sorted(app_set, key=_key_selector)
+    print(s_dict)
+
+    for lvl in chunks_dict.items():
+        res[lvl[0]] = []
+        # convert set into list: computes indexes
+        s_d = sorted(lvl[1], key=_key_selector)
+        # for word in res[item[0]]:
+        for sq in seqs:
+            # first char
+            search_str = ""
+            i = 0
+            while i < len(sq):
+                search_str = search_str + sq[i]
+                # search search_str in words bag
+                ind = -1
+                for w in s_d:
+                    if w.find(search_str) == 0:
+                        ind = s_dict.index(w)
+                if ind > -1:
+                    # match
+                    match = s_dict[ind]
+                    res[lvl[0]].append(ind)
+                    search_str = ""
+                    i = i + len(match)
+                else:
+                    i = i + 1
+            if search_str != "":
+                res[lvl[0]].append(search_str)
+    print (res)
+
+
 # write tps instead of token in sequences
-def write_tp_seq(tps):
+def write_tp_file(tps, seqs, console=True):
     """
         write transitional probabilities sequences for each order in file and console.
 
@@ -210,30 +326,39 @@ def write_tp_seq(tps):
         ----------
         tps : dict
         the transitional probabilities dictionary
-        """
+        seqs: list of str
+        input sequences
+        console : bool
+        If True print (colored) tps in (Python) console too
+    """
     with open(os.path.join(sys.path[0], "out_tps.txt"), "w") as fp:
         for ind in tps.keys():
             fp.write(str(ind) + ":\n")
-            print (str(ind) + ":\n")
+            i = 0
             for item in tps[ind]:
+                i += 1
                 # vl to write
                 vl = ""
                 # vl2 to print
                 vl2 = ""
+                j = 0
                 for x in item:
                     if x != "-":
                         rs = round(x, 2)
-                        clr = BColors.GREEN
-                        if rs < 0.3:
-                            clr = BColors.CYAN
-                        elif rs > 0.7:
+                        if rs < Params.TSH:
                             clr = BColors.RED
-                        vl2 += clr + '(' + str(rs) + ')' + BColors.END + '\t'
+                        else:
+                            clr = BColors.BLUE
+                        # vl2 += clr + '(' + str(rs) + ')' + BColors.END + '\t'
+                        vl2 += clr + str(seqs[i - 1][j]) + BColors.END + ' '
                         vl += '(' + str(round(x, 2)) + ')\t'
                     else:
-                        vl2 += ' (' + x + ') \t'
+                        # vl2 += ' (' + x + ') \t'
+                        vl2 += x + ' '
                         vl += ' (' + x + ') \t'
-                print(vl2)
+                    j += 1
+                if console:
+                    print(vl2)
                 fp.write(vl + "\n")
 
 
@@ -260,3 +385,17 @@ def read_from_file(file_name, separator=""):
                 a = line.strip().split(separator)
             lst.append(a)
     return lst
+
+
+# generate a sequence starting from initial symbol
+# def generate(tps, init_symbol):
+#     res = dict()
+#     lvl = 0
+#     past = ""
+#     # num of symbols to generate
+#     for o in range(5):
+#         res[o] = set()
+#         for n in tps[o]:
+#             for v in n:
+#                 res[o].update(n.split())
+#     print(res)
