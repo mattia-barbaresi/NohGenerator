@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import math
 import os
 import sys
 import numpy as np
@@ -7,8 +7,6 @@ import numpy as np
 
 # for colored console out
 class BColors:
-    def __init__(self):
-        pass
 
     CYAN = '\033[96m'
     PURPLE = '\033[95m'
@@ -21,39 +19,36 @@ class BColors:
 
 # parameters
 class Params:
-    def __init__(self):
-        pass
-
-    TSH = 0.5
+    # in max-entropy sequences each symbol has 1/N freq.
+    TSH = 0.51
 
 
+# sort key selector function
 def _key_selector(x):
-    '''
-    Select key for the sort function
-    '''
     return len(x)
 
 
 # calculates frequency (occ./tot) of each ngram, as single set
-def ngram_freq(mtx, order_limit=6):
-    """This function computes overall frequencies for ngrams up to order-limit in mtx
+def ngram_freq(seqs, order_limit=6):
+    """
+    This function computes overall frequencies for ngrams up to order-limit in seqs
 
-        ...
+    ...
 
-        Parameters
-        ----------
-        mtx : matrix
-            a 2D-array of integers
-        order_limit : int
-            the maximum ngram length calculated
+    Parameters
+    ----------
+    seqs : matrix
+        a 2D-array of integers
+    order_limit : int
+        the maximum ngram length calculated
     """
 
     dic = dict()
     for order in range(order_limit):
-        _shape = (max(max(mtx)) + 1,) * (order + 1)
+        _shape = (max(max(seqs)) + 1,) * (order + 1)
         m = np.zeros(_shape)
         dic[order] = {}
-        for arr in mtx:
+        for arr in seqs:
             for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
                 m[_ind] += 1
         # divide all m by the sum
@@ -66,23 +61,24 @@ def ngram_freq(mtx, order_limit=6):
 
 
 # calculates frequency (occ./tot) foreach ngram, foreach line
-def ngram_freq_per_line(mtx, order_limit=6):
-    """This function computes frequencies, for each line, for ngrams up to order-limit in mtx
+def ngram_freq_per_line(seqs, order_limit=6):
+    """
+    This function computes frequencies, for each line, for ngrams up to order-limit in seqs
 
-        ...
+    ...
 
-        Parameters
-        ----------
-        mtx : matrix
-            a 2D-array of integers
-        order_limit : int
-            the maximum ngram length calculated
+    Parameters
+    ----------
+    seqs : matrix
+        a 2D-array of integers
+    order_limit : int
+        the maximum ngram length calculated
     """
 
     dic = dict()
     for order in range(order_limit):
         dic[order] = dict()
-        for arr in mtx:
+        for arr in seqs:
             if len(arr) > order:
                 _shape = (max(arr) + 1,) * (order + 1)
                 m = np.zeros(_shape)
@@ -97,14 +93,14 @@ def ngram_freq_per_line(mtx, order_limit=6):
 
 
 # calculates markov transitional occurrences
-def markov_trans_occ(mtx, order_limit=6):
+def markov_trans_occ(seqs, order_limit=6):
     """This function computes transition occurrences dict up to order-limit
 
     ...
 
     Parameters
     ----------
-    mtx : matrix
+    seqs : matrix
         a 2D-array of string
     order_limit : int
         the maximum ngram length calculated
@@ -114,7 +110,7 @@ def markov_trans_occ(mtx, order_limit=6):
         dic[order] = dict()
         # init new dict for counting
         m = dict()
-        for arr in mtx:
+        for arr in seqs:
             # read and count n-grams in sequences
             for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
                 val = " ".join(str(e) for e in _ind)
@@ -140,19 +136,19 @@ def markov_trans_occ(mtx, order_limit=6):
 
 
 # calculates probabilities of markov transitions
-def markov_trans_prob(mtx, order_limit=6):
+def markov_trans_freq(seqs, order_limit=6):
     """This function computes conditional entropy dict up to order-limit
 
     ...
 
     Parameters
     ----------
-    mtx : matrix
+    seqs : matrix
         a 2D-array of string
     order_limit : int
         the maximum ngram length calculated
     """
-    cto = markov_trans_occ(mtx, order_limit)
+    cto = markov_trans_occ(seqs, order_limit)
     m = dict()
     for itm in cto.items():
         order = list(itm)
@@ -173,6 +169,45 @@ def markov_trans_prob(mtx, order_limit=6):
     return m
 
 
+# calculates probabilities of markov transitions
+def markov_trans_prob(seqs, order_limit=6):
+    """This function computes conditional entropy dict up to order-limit
+
+    ...
+
+    Parameters
+    ----------
+    seqs : matrix
+        a 2D-array of string
+    order_limit : int
+        the maximum ngram length calculated
+    """
+    cto = markov_trans_occ(seqs, order_limit)
+    m = dict()
+    count_tot = 0
+    for itm in cto.items():
+        order = list(itm)
+        m[order[0]] = dict()
+        if order[0] > 0:
+            # tot count for order
+            order_tot = count_tot - order[0]
+            # higher orders
+            for itm2 in order[1].items():
+                tpo = list(itm2)
+                m[order[0]][tpo[0]] = dict()
+                # count all transitions
+                tot = sum(tpo[1].values())
+                for x in tpo[1].items():
+                    m[order[0]][tpo[0]][x[0]] = (float(x[1]) / int(tot)) / float(tot/order_tot)
+        else:
+            # 0th-order has no transitions
+            tot = sum(order[1].values())
+            count_tot = tot
+            for x in order[1].items():
+                m[order[0]][x[0]] = float(x[1]) / int(tot)
+    return m
+
+
 # switch tokens with their transitional probabilities in the given sequences
 def detect_transitions(sequences, mtp):
     """
@@ -183,9 +218,9 @@ def detect_transitions(sequences, mtp):
     Parameters
     ----------
     sequences : matrix
-    list of sequences to analyze
+        list of sequences to analyze
     mtp : dict
-    the transitional probabilities dictionary
+        the transitional probabilities dictionary
     """
     res = dict()
     for order in mtp.items():
@@ -214,11 +249,10 @@ def detect_transitions(sequences, mtp):
 
 
 # chunking sequences
-def chunk_sequences(mtp, seqs, ord_max):
-    # ignore 0th-order
+def chunk_sequences(seqs, mtp, ord_max):
     cl = dict()
     # cl = set()
-    for order in range(1, ord_max):
+    for order in range(1, ord_max):  # ignore 0th-order
         cl[order] = set()
         i = 0
         for x in mtp[order]:
@@ -233,105 +267,84 @@ def chunk_sequences(mtp, seqs, ord_max):
                         # cl.add(cks)
                         cks = str(seqs[i][j])
                 j = j + 1
-            if cks != "":
+            if cks != "" and cks != "".join(seqs[i]):  # not store the entire sequences
                 cl[order].add(cks)
                 # cl.add(cks)
             i = i + 1
     return cl
 
 
+def chunk_recognition(bag, pos, sq):
+    arr = []
+    # first char
+    search_str = ""
+    i = 0
+    while i < len(sq):
+        search_str = "".join(sq[i:])
+        # search search_str in words bag
+        # actually select the longer chunk
+
+        # -------------------------------------------------------
+        ind = -1
+        # order chunks by ascending length and pick the first match
+        for w in sorted(bag, key=_key_selector):
+            if search_str.find(w) == 0:
+                ind = pos.index(w)
+        if ind > -1:
+            # match
+            match = str(ind)
+            arr.append(match)
+            search_str = ""
+            i = i + len(match)
+        else:
+            i = i + 1
+            # if search_str is not empty, detection has failed
+
+        # -------------------------------------------------------
+    return arr
+
+
 # rewrite sequences with chunks
 def chunks_detection(seqs, chunks_dict):
-    # results
-    res = dict()
-    # for each order
-    for lvl in chunks_dict.items():
-        res[lvl[0]] = []
-        # convert set into list: computes indexes
-        s_dict = sorted(lvl[1], key=_key_selector)
-        print(s_dict)
-        # for word in res[item[0]]:
-        for sq in seqs:
-            # first char
-            search_str = ""
-            i = 0
-            while i < len(sq):
-                search_str = search_str + sq[i]
-                # search search_str in words bag
-                ind = -1
-                for w in s_dict:
-                    if w.find(search_str) == 0:
-                        ind = s_dict.index(w)
-                if ind > -1:
-                    # match
-                    match = s_dict[ind]
-                    res[lvl[0]].append(ind)
-                    search_str = ""
-                    i = i + len(match)
-                else:
-                    i = i + 1
-            if search_str != "":
-                res[lvl[0]].append(search_str)
-    print (res)
-
-
-# rewrite sequences with chunks
-def chunks_detection2(seqs, chunks_dict):
     # results
     res = dict()
     app_set = set()
     # create one array of words
     for lvl in chunks_dict.items():
         app_set = app_set | (lvl[1])
-    s_dict = sorted(app_set, key=_key_selector)
-    print(s_dict)
-
+    sorted_dict = sorted(app_set, key=_key_selector)
+    print("sorted_dict: ", sorted_dict)
     for lvl in chunks_dict.items():
         res[lvl[0]] = []
-        # convert set into list: computes indexes
-        s_d = sorted(lvl[1], key=_key_selector)
-        # for word in res[item[0]]:
+        # foreach sequence
         for sq in seqs:
-            # first char
-            search_str = ""
-            i = 0
-            while i < len(sq):
-                search_str = search_str + sq[i]
-                # search search_str in words bag
-                ind = -1
-                for w in s_d:
-                    if w.find(search_str) == 0:
-                        ind = s_dict.index(w)
-                if ind > -1:
-                    # match
-                    match = s_dict[ind]
-                    res[lvl[0]].append(ind)
-                    search_str = ""
-                    i = i + len(match)
-                else:
-                    i = i + 1
-            if search_str != "":
-                res[lvl[0]].append(search_str)
-    print (res)
+            arr = chunk_recognition(lvl[1], sorted_dict, sq)
+            if len(arr) > 0:
+                res[lvl[0]].append(arr)
+
+    return res
 
 
 # write tps instead of token in sequences
-def write_tp_file(tps, seqs, console=True):
+def write_tp_file(file_name, tps, seqs, console=True):
     """
-        write transitional probabilities sequences for each order in file and console.
+    write transitional probabilities sequences for each order in file and console.
 
-        ...
+    ...
 
-        Parameters
-        ----------
-        tps : dict
+    Parameters
+    ----------
+
+    file_name : str
+        the name of the file
+    tps : dict
         the transitional probabilities dictionary
-        seqs: list of str
+    seqs: list of str
         input sequences
-        console : bool
+    console : bool
         If True print (colored) tps in (Python) console too
     """
-    with open(os.path.join(sys.path[0], "out_tps.txt"), "w") as fp:
+    with open(os.path.join(sys.path[0], file_name), "w") as fp:
         for ind in tps.keys():
             fp.write(str(ind) + ":\n")
             i = 0
@@ -377,7 +390,7 @@ def read_from_file(file_name, separator=""):
         the name of the file to read
     """
     lst = []
-    with open(file_name) as fp:
+    with open(file_name, encoding="utf8") as fp:
         for line in fp:
             if separator == "":
                 a = list(line.strip())
