@@ -249,7 +249,7 @@ def detect_transitions(sequences, mtp):
 
 
 # chunking sequences
-def chunk_sequences(seqs, mtp, ord_max):
+def chunk_sequences(seqs, mtp, ord_max, separator=""):
     cl = dict()
     # cl = set()
     for order in range(1, ord_max):  # ignore 0th-order
@@ -260,27 +260,29 @@ def chunk_sequences(seqs, mtp, ord_max):
             j = 0
             while j < len(x):
                 if str(x[j]) == "-" or float(x[j]) >= Params.TSH:
-                    cks = cks + str(seqs[i][j])
+                    cks = cks + separator + str(seqs[i][j])
                 else:
                     if cks != "":
+                        cks = cks.strip(separator)
                         cl[order].add(cks)
                         # cl.add(cks)
                         cks = str(seqs[i][j])
                 j = j + 1
-            if cks != "" and cks != "".join(seqs[i]):  # not store the entire sequences
+            cks = cks.strip(separator)
+            if cks != "" and cks != separator.join(seqs[i]):  # not store the entire sequences
                 cl[order].add(cks)
                 # cl.add(cks)
             i = i + 1
     return cl
 
 
-def chunk_recognition(bag, pos, sq):
+def chunk_recognition(bag, pos, sq, separator=""):
     arr = []
     # first char
     search_str = ""
     i = 0
     while i < len(sq):
-        search_str = "".join(sq[i:])
+        search_str = separator.join(sq[i:])
         # search search_str in words bag
         # actually select the longer chunk
 
@@ -294,8 +296,10 @@ def chunk_recognition(bag, pos, sq):
             # match
             match = str(ind)
             arr.append(match)
-            search_str = ""
-            i = i + len(match)
+            if separator == "":
+                i = i + len(pos[ind].split())
+            else:
+                i = i + len(pos[ind].split(separator))
         else:
             i = i + 1
             # if search_str is not empty, detection has failed
@@ -305,24 +309,28 @@ def chunk_recognition(bag, pos, sq):
 
 
 # rewrite sequences with chunks
-def chunks_detection(seqs, chunks_dict):
+def chunks_detection(seqs, chunks_dict, separator):
     # results
     res = dict()
+    sorted_dict = dict_to_array(chunks_dict)
+    for lvl in chunks_dict.items():
+        res[lvl[0]] = []
+        # foreach sequence
+        for sq in seqs:
+            arr = chunk_recognition(lvl[1], sorted_dict, sq, separator)
+            if len(arr) > 0:
+                res[lvl[0]].append(arr)
+    return res
+
+
+def dict_to_array(chunks_dict):
     app_set = set()
     # create one array of words
     for lvl in chunks_dict.items():
         app_set = app_set | (lvl[1])
     sorted_dict = sorted(app_set, key=_key_selector)
-    print("sorted_dict: ", sorted_dict)
-    for lvl in chunks_dict.items():
-        res[lvl[0]] = []
-        # foreach sequence
-        for sq in seqs:
-            arr = chunk_recognition(lvl[1], sorted_dict, sq)
-            if len(arr) > 0:
-                res[lvl[0]].append(arr)
-
-    return res
+    # print("sorted_dict: ", sorted_dict)
+    return sorted_dict
 
 
 # write tps instead of token in sequences
