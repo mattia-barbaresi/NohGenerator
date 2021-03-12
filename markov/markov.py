@@ -137,7 +137,7 @@ def markov_trans_occ(seqs, order_limit=6):
 
 # calculates probabilities of markov transitions
 def markov_trans_freq(seqs, order_limit=6):
-    """This function computes conditional entropy dict up to order-limit
+    """This function computes transition frequencies dict up to order-limit
 
     ...
 
