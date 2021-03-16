@@ -22,28 +22,27 @@ import complexity
 # Learning" - (Herbert A. Simon and Edward A. Feigenbaum, 1964)
 
 
-# init
+# -------------------------------------------------- init, read input
 pp = pprint.PrettyPrinter(indent=2)
-separator = ""
 # read
 file_in = "markov/input.txt"
-sequences = markov.read_from_file(file_in, separator)
+sequences = markov.read_from_file(file_in, " ")
+new_seqs = sequences
 
-# ----------------------------------------------------------- tokens
-# compute transitions frequencies and extract tokens
+# -------------------------------------------------- tokens
+# compute transitions frequencies
 tf = markov.markov_trans_freq(sequences)
 # rewrite sequences with tf
 tf_seqs = markov.detect_transitions(sequences,tf)
 # tokenize sequences
-tokens = markov.chunk_sequences(sequences,tf_seqs,6,separator)
-t_d = markov.dict_to_array(tokens)
-tokenized = markov.chunks_detection(sequences,tokens, separator)
-print("tokenized:")
-pp.pprint(tokenized)
-# ----------------------------------------------------------- schemas/patterns
-# convert dictionary levels in array
+tokens = markov.chunk_sequences(sequences,tf_seqs,6)
+token_vocabulary = markov.dict_to_array(tokens)
+tokenized = markov.chunks_detection(sequences,tokens)
+
+# -------------------------------------------------- patterns
 arr = []
 for pat in tokenized.items():
+    # convert dictionary levels in array
     for sq in pat[1]:
         if sq:
             arr.append(list(str(x) for x in sq))
@@ -53,17 +52,16 @@ tf_tok = markov.markov_trans_freq(arr)
 tf_tok_seq = markov.detect_transitions(arr,tf_tok)
 # patternize sequences
 patterns = markov.chunk_sequences(arr,tf_tok_seq,6)
-t_p = markov.dict_to_array(patterns)
-patternized = markov.chunks_detection(arr,patterns, separator)
-print("patternized:")
-pp.pprint(patternized)
+pattern_vocabulary = markov.dict_to_array(patterns)
+patternized = markov.chunks_detection(arr,patterns)
 
-# -----------------------------------------------------------
-# output  and to console
-# -----------------------------------------------------------
+# markov.generate(tf, token_vocabulary, tf_tok, pattern_vocabulary,10)
+# markov.detect(new_seqs, token_vocabulary, pattern_vocabulary)
+
+# -------------------------------------------------- output  and to console
 
 # markov.write_tp_file("tokens.txt",tf_seqs,sequences)
-print(" ----------------")
+# print(" ----------------")
 # markov.write_tp_file("tokenized.txt",tf_tok_seq,arr)
 
 # print (" ----------------")
@@ -73,3 +71,5 @@ print(" ----------------")
 # write
 # with open("markov/markov.json", "w") as fp:
 #     json.dump(tf_seqs, fp)
+# markov.write_tp_file("blabla",tf_seqs,sequences)
+# markov.write_tp_file("blabla",tf_tok_seq,arr)

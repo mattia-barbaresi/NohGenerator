@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 import math
 import os
+import random
 import sys
 import numpy as np
+import pprint
 
+pp = pprint.PrettyPrinter(indent=2)
 
 # for colored console out
 class BColors:
@@ -20,7 +23,7 @@ class BColors:
 # parameters
 class Params:
     # in max-entropy sequences each symbol has 1/N freq.
-    TSH = 0.51
+    TSH = 0.5
 
 
 # sort key selector function
@@ -249,7 +252,23 @@ def detect_transitions(sequences, mtp):
 
 
 # chunking sequences
-def chunk_sequences(seqs, mtp, ord_max, separator=""):
+def chunk_sequences(seqs, mtp, ord_max):
+    """
+    Returns segments/chunks of seqs extracted using mtp transitions
+
+    ...
+
+    Parameters
+    ----------
+    seqs : matrix
+        list of sequences to analyze
+    mtp : dict
+        the transitional probabilities dictionary
+    ord_max : int
+        max level/order in dict
+    separator : str
+        separator used for seqs
+    """
     cl = dict()
     # cl = set()
     for order in range(1, ord_max):  # ignore 0th-order
@@ -260,33 +279,33 @@ def chunk_sequences(seqs, mtp, ord_max, separator=""):
             j = 0
             while j < len(x):
                 if str(x[j]) == "-" or float(x[j]) >= Params.TSH:
-                    cks = cks + separator + str(seqs[i][j])
+                    cks = cks + " " + str(seqs[i][j])
                 else:
                     if cks != "":
-                        cks = cks.strip(separator)
+                        cks = cks.strip(" ")
                         cl[order].add(cks)
                         # cl.add(cks)
                         cks = str(seqs[i][j])
                 j = j + 1
-            cks = cks.strip(separator)
-            if cks != "" and cks != separator.join(seqs[i]):  # not store the entire sequences
+            cks = cks.strip(" ")
+            if cks != "" and cks != " ".join(seqs[i]):  # not store the entire sequences
                 cl[order].add(cks)
                 # cl.add(cks)
             i = i + 1
     return cl
 
 
-def chunk_recognition(bag, pos, sq, separator=""):
+def chunk_recognition(bag, pos, sq):
+    """
+    Return the list of token (in bag) that match sq
+    """
     arr = []
     # first char
-    search_str = ""
     i = 0
     while i < len(sq):
-        search_str = separator.join(sq[i:])
+        search_str = " ".join(sq[i:])
         # search search_str in words bag
-        # actually select the longer chunk
-
-        # -------------------------------------------------------
+        # actually select the longer chunk that match initial position in search_str
         ind = -1
         # order chunks by ascending length and pick the first match
         for w in sorted(bag, key=_key_selector):
@@ -296,20 +315,18 @@ def chunk_recognition(bag, pos, sq, separator=""):
             # match
             match = str(ind)
             arr.append(match)
-            if separator == "":
-                i = i + len(pos[ind].split())
-            else:
-                i = i + len(pos[ind].split(separator))
+            i = i + len(pos[ind].split(" "))
         else:
             i = i + 1
-            # if search_str is not empty, detection has failed
-
-        # -------------------------------------------------------
+        # if search_str is not empty, detection has failed
     return arr
 
 
 # rewrite sequences with chunks
-def chunks_detection(seqs, chunks_dict, separator):
+def chunks_detection(seqs, chunks_dict):
+    """
+    Return seqs converted using tokens/chunks
+    """
     # results
     res = dict()
     sorted_dict = dict_to_array(chunks_dict)
@@ -317,13 +334,16 @@ def chunks_detection(seqs, chunks_dict, separator):
         res[lvl[0]] = []
         # foreach sequence
         for sq in seqs:
-            arr = chunk_recognition(lvl[1], sorted_dict, sq, separator)
+            arr = chunk_recognition(lvl[1], sorted_dict, sq)
             if len(arr) > 0:
                 res[lvl[0]].append(arr)
     return res
 
 
 def dict_to_array(chunks_dict):
+    """
+    Collect values in a set then convert the set in a (ordered) list
+    """
     app_set = set()
     # create one array of words
     for lvl in chunks_dict.items():
@@ -384,7 +404,7 @@ def write_tp_file(file_name, tps, seqs, console=True):
 
 
 # reads list of sequences from file
-def read_from_file(file_name, separator=""):
+def read_from_file(file_name, separator=" "):
     """
     Read a list of strings and split into tokens using separator.
 
@@ -408,15 +428,45 @@ def read_from_file(file_name, separator=""):
     return lst
 
 
-# generate a sequence starting from initial symbol
-# def generate(tps, init_symbol):
-#     res = dict()
-#     lvl = 0
-#     past = ""
-#     # num of symbols to generate
-#     for o in range(5):
-#         res[o] = set()
-#         for n in tps[o]:
-#             for v in n:
-#                 res[o].update(n.split())
-#     print(res)
+def mc_choice(arr):
+    rnd = random.randint(0, 1)
+    sm = 0.0
+    j = 0
+    ind = -1
+    while sm < rnd:
+        sm += float(arr[j])
+        if sm >= rnd:
+            ind = j
+        j += 1
+    return ind
+
+
+# from tokens and patterns, generates (occ) sequences starting from initial symbol
+def generate(token_tps, token_voc, pattern_tps, pattern_voc, occ, n=16, init_symbol=-1):
+
+    print("pattern_tps: ")
+    pp.pprint(pattern_tps)
+
+    # generation methods: (i) looking at tokens freqs, (ii) looking a patterns freqs, (iii) mixed..
+    # at what level
+    # IDEA:
+    # generate using tokens transitional probabilities.. and DETECT new schemas
+    # so the "STM" decode with tokens and "search"/"rehearse" for patterns/schemas in LTM!!
+
+    idx = mc_choice(list(pattern_tps[0].values()))
+    str_res = list(pattern_tps[0].keys())[idx]
+    print("idx:", idx)
+    print("res:", str_res)
+
+    # higher levels
+    for lvl in pattern_tps.keys():
+        if lvl > 0:
+            print(pattern_tps[lvl])
+            idx = mc_choice(list(pattern_tps[lvl][0].values()))
+
+    return str_res
+
+
+# detect input seqs using token and patter vocabs
+def detect(seqs, token_voc, pattern_voc, ):
+    pass
