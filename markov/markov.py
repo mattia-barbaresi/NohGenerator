@@ -1,16 +1,14 @@
 #!/usr/bin/env python
-import math
-import os
+
 import random
-import sys
 import numpy as np
 import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
 
+
 # for colored console out
 class BColors:
-
     CYAN = '\033[96m'
     PURPLE = '\033[95m'
     BLUE = '\033[94m'
@@ -252,7 +250,7 @@ def detect_transitions(sequences, mtp):
 
 
 # chunking sequences
-def chunk_sequences(seqs, mtp, ord_max):
+def chunk_sequences(seqs, mtp, ord_max=6):
     """
     Returns segments/chunks of seqs extracted using mtp transitions
 
@@ -354,7 +352,7 @@ def dict_to_array(chunks_dict):
 
 
 # write tps instead of token in sequences
-def write_tp_file(file_name, tps, seqs, console=True):
+def write_tp_file(path, tps, seqs, console=True):
     """
     write transitional probabilities sequences for each order in file and console.
 
@@ -363,7 +361,7 @@ def write_tp_file(file_name, tps, seqs, console=True):
     Parameters
     ----------
 
-    file_name : str
+    path : str
         the name of the file
     tps : dict
         the transitional probabilities dictionary
@@ -372,7 +370,7 @@ def write_tp_file(file_name, tps, seqs, console=True):
     console : bool
         If True print (colored) tps in (Python) console too
     """
-    with open(os.path.join(sys.path[0], file_name), "w") as fp:
+    with open(path, "w") as fp:
         for ind in tps.keys():
             fp.write(str(ind) + ":\n")
             i = 0
@@ -424,7 +422,8 @@ def read_from_file(file_name, separator=" "):
                 a = list(line.strip())
             else:
                 a = line.strip().split(separator)
-            lst.append(a)
+            if a:
+                lst.append(a)
     return lst
 
 
@@ -442,29 +441,38 @@ def mc_choice(arr):
 
 
 # from tokens and patterns, generates (occ) sequences starting from initial symbol
-def generate(token_tps, token_voc, pattern_tps, pattern_voc, occ, n=16, init_symbol=-1):
+def generate(token_voc, pattern_tps, pattern_voc, occ, n=16):
 
-    print("pattern_tps: ")
-    pp.pprint(pattern_tps)
+    print("token_voc: ",token_voc)
+    print("pattern_voc: ",pattern_voc)
 
-    # generation methods: (i) looking at tokens freqs, (ii) looking a patterns freqs, (iii) mixed..
-    # at what level
-    # IDEA:
-    # generate using tokens transitional probabilities.. and DETECT new schemas
-    # so the "STM" decode with tokens and "search"/"rehearse" for patterns/schemas in LTM!!
-
-    idx = mc_choice(list(pattern_tps[0].values()))
-    str_res = list(pattern_tps[0].keys())[idx]
-    print("idx:", idx)
-    print("res:", str_res)
+    res = dict()
 
     # higher levels
-    for lvl in pattern_tps.keys():
-        if lvl > 0:
-            print(pattern_tps[lvl])
-            idx = mc_choice(list(pattern_tps[lvl][0].values()))
+    for o in pattern_tps.keys():
+        if int(o) == 0:
+            # not considered
+            pass
+        else:
+            # first
+            keys = list(pattern_tps[o].keys())
+            print("keys:", keys)
+            idx = random.choice(keys)
 
+            print("idx:", idx)
+            patt = [int(x) for x in idx.split(" ")]
+            str_res = np.array(token_voc)[patt]
+            print("res:", str_res)
+
+            mc_choice(list(pattern_tps[o][str(idx)].values()))
+            for r in range(1, occ):
+                pass
     return str_res
+
+
+# convert symbols in sequences using vocabulary
+def convert_sequences(vocabulary, sequences):
+    pass
 
 
 # detect input seqs using token and patter vocabs

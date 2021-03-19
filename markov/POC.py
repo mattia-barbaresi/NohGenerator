@@ -1,45 +1,55 @@
+from datetime import datetime
 import json
 import pprint
 import markov
+import os
 import complexity
 
 
-#
-# According to the EPAM theory, when information is received by the sensory organs it initially undergoes an encoding
-# process usually referred to as (i) feature extraction.
-# (ii) The stimulus is then recognized on the basis of the features encoded by the feature extraction process,
-# (iii) and a symbol is stored in short-term memory that “points to” or accesses the relevant information
-# in semantic long-term memory.
-#
-#           sensory-perceptual front-end
-#       ------------------------------------
-#                     EPAM
-#       ------------------------------------
-#               semantic back-end
-#
-#
-# in "An Information-Processing Theory of Some Effects of Similarity, Familiarization, and Meaningfulness in Verbal
-# Learning" - (Herbert A. Simon and Edward A. Feigenbaum, 1964)
+# --------------------------------------------------functions
+# call fun
+def compute(seqs, dir_name, filename):
+    # compute transitions frequencies
+    tf = markov.markov_trans_freq(seqs)
+    # rewrite seqs with tf
+    tf_seqs = markov.detect_transitions(seqs, tf)
+    # tokenize seqs
+    chunks = markov.chunk_sequences(seqs, tf_seqs)
+    vocab = markov.dict_to_array(chunks)
+    detected = markov.chunks_detection(seqs, chunks)
+    # write
+    with open(dir_name + filename + "_tf.json", "w") as fp:
+        json.dump(tf, fp)
+    with open(dir_name + filename + "_tf_seqs.json", "w") as fp:
+        json.dump(tf_seqs, fp)
+    with open(dir_name + filename + "_chunks.json", "w") as fp:
+        json.dump(chunks, fp, default=serialize_sets)
+    with open(dir_name + filename + "_vocab.json", "w") as fp:
+        json.dump(vocab, fp)
+    with open(dir_name + filename + "_detected.json", "w") as fp:
+        json.dump(detected, fp)
+    return tf, chunks, vocab, detected
 
 
-# -------------------------------------------------- init, read input
+# serialize sets
+def serialize_sets(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    return obj
+
+
+# init, input, output
 pp = pprint.PrettyPrinter(indent=2)
-# read
 file_in = "markov/input.txt"
-sequences = markov.read_from_file(file_in, " ")
+dir_out = "markov/results_" + datetime.now().strftime("%Y%m%d-%H.%M") + "/"
+os.mkdir(dir_out)
+sequences = markov.read_from_file(file_in, "")
 new_seqs = sequences
 
-# -------------------------------------------------- tokens
-# compute transitions frequencies
-tf = markov.markov_trans_freq(sequences)
-# rewrite sequences with tf
-tf_seqs = markov.detect_transitions(sequences,tf)
-# tokenize sequences
-tokens = markov.chunk_sequences(sequences,tf_seqs,6)
-token_vocabulary = markov.dict_to_array(tokens)
-tokenized = markov.chunks_detection(sequences,tokens)
+# compute tokens
+tkn_tf, tokens, token_vocabulary, tokenized = compute(sequences, dir_out, "tokens")
 
-# -------------------------------------------------- patterns
+# convert tokenized to arr
 arr = []
 for pat in tokenized.items():
     # convert dictionary levels in array
@@ -47,19 +57,15 @@ for pat in tokenized.items():
         if sq:
             arr.append(list(str(x) for x in sq))
 
-# encoding sequences using tokens to calculate patterns
-tf_tok = markov.markov_trans_freq(arr)
-tf_tok_seq = markov.detect_transitions(arr,tf_tok)
-# patternize sequences
-patterns = markov.chunk_sequences(arr,tf_tok_seq,6)
-pattern_vocabulary = markov.dict_to_array(patterns)
-patternized = markov.chunks_detection(arr,patterns)
+# compute patterns
+pat_tf, patterns, pattern_vocabulary, patternized = compute(arr, dir_out, "patterns")
 
-# markov.generate(tf, token_vocabulary, tf_tok, pattern_vocabulary,10)
-# markov.detect(new_seqs, token_vocabulary, pattern_vocabulary)
 
-# -------------------------------------------------- output  and to console
+# generation
+markov.generate(token_vocabulary, pat_tf, pattern_vocabulary, 10)
 
+
+# output  and to console
 # markov.write_tp_file("tokens.txt",tf_seqs,sequences)
 # print(" ----------------")
 # markov.write_tp_file("tokenized.txt",tf_tok_seq,arr)
@@ -69,7 +75,5 @@ patternized = markov.chunks_detection(arr,patterns)
 # print (json.dumps(res, indent=4, sort_keys=True))
 
 # write
-# with open("markov/markov.json", "w") as fp:
-#     json.dump(tf_seqs, fp)
-# markov.write_tp_file("blabla",tf_seqs,sequences)
-# markov.write_tp_file("blabla",tf_tok_seq,arr)
+# markov.write_tp_file(dir_out + "blabla",tf_seqs,sequences, False)
+# markov.write_tp_file(dir_out + "blabla",tf_tok_seq,arr, False)

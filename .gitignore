@@ -3,3 +3,4 @@
 data/results/*
 markov/*.txt
 markov/*.json
+markov/results_*
