@@ -62,8 +62,17 @@ pat_tf, patterns, pattern_vocabulary, patternized = compute(arr, dir_out, "patte
 
 
 # generation
-markov.generate(token_vocabulary, pat_tf, pattern_vocabulary, 10)
+generated = markov.generate(pat_tf, 10)
 
+t1 = markov.translate(generated,pattern_vocabulary)
+t2 = markov.translate(t1,token_vocabulary)
+
+with open(dir_out + "generated.json", "w") as fp:
+    json.dump(generated, fp, default=serialize_sets)
+with open(dir_out + "translated.json", "w") as fp:
+    json.dump(t1, fp, default=serialize_sets)
+with open(dir_out + "translated_2.json", "w") as fp:
+    json.dump(t2, fp, default=serialize_sets)
 
 # output  and to console
 # markov.write_tp_file("tokens.txt",tf_seqs,sequences)

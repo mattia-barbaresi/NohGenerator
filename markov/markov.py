@@ -199,7 +199,7 @@ def markov_trans_prob(seqs, order_limit=6):
                 # count all transitions
                 tot = sum(tpo[1].values())
                 for x in tpo[1].items():
-                    m[order[0]][tpo[0]][x[0]] = (float(x[1]) / int(tot)) / float(tot/order_tot)
+                    m[order[0]][tpo[0]][x[0]] = (float(x[1]) / int(tot)) / float(tot / order_tot)
         else:
             # 0th-order has no transitions
             tot = sum(order[1].values())
@@ -264,8 +264,6 @@ def chunk_sequences(seqs, mtp, ord_max=6):
         the transitional probabilities dictionary
     ord_max : int
         max level/order in dict
-    separator : str
-        separator used for seqs
     """
     cl = dict()
     # cl = set()
@@ -428,10 +426,10 @@ def read_from_file(file_name, separator=" "):
 
 
 def mc_choice(arr):
-    rnd = random.randint(0, 1)
-    sm = 0.0
-    j = 0
-    ind = -1
+    rnd = random.uniform(0, 1)
+    sm = arr[0]
+    j = 1
+    ind = 0
     while sm < rnd:
         sm += float(arr[j])
         if sm >= rnd:
@@ -441,38 +439,51 @@ def mc_choice(arr):
 
 
 # from tokens and patterns, generates (occ) sequences starting from initial symbol
-def generate(token_voc, pattern_tps, pattern_voc, occ, n=16):
-
-    print("token_voc: ",token_voc)
-    print("pattern_voc: ",pattern_voc)
-
+def generate(tps, n_seq, occ_per_seq=16):
     res = dict()
-
-    # higher levels
-    for o in pattern_tps.keys():
-        if int(o) == 0:
-            # not considered
-            pass
+    for order in tps.keys():
+        res[order] = list()
+        if int(order) == 0:
+            for _ns in range(0, n_seq):
+                str_res = ""
+                for _ops in range(0, occ_per_seq):
+                    idx = mc_choice(list(tps[order].values()))
+                    str_res += " " + list(tps[order].keys())[idx]
+                res[order].append(str_res.strip(" "))
         else:
-            # first
-            keys = list(pattern_tps[o].keys())
-            print("keys:", keys)
-            idx = random.choice(keys)
-
-            print("idx:", idx)
-            patt = [int(x) for x in idx.split(" ")]
-            str_res = np.array(token_voc)[patt]
-            print("res:", str_res)
-
-            mc_choice(list(pattern_tps[o][str(idx)].values()))
-            for r in range(1, occ):
-                pass
-    return str_res
+            for _ns in range(0, n_seq):
+                # first choice
+                keys = list(tps[order].keys())
+                str_res = random.choice(keys)
+                sid = str_res
+                # all other occs
+                for _ops in range(0, occ_per_seq - order):
+                    #  ending symbol, no further nth-order transition
+                    # cut first symbol and search for the order-1 transition
+                    i = 0
+                    while i < order and sid not in tps[order - i].keys():
+                        sid = " ".join(sid.split(" ")[1:])
+                        i += 1
+                        if i == order:
+                            print("ERRORORORROROROROR")
+                    val = tps[order - i][sid]
+                    idx = mc_choice(list(val.values()))
+                    str_res += " " + list(val.keys())[idx]
+                    sid = " ".join(str_res.split(" ")[-order:])
+                res[order].append(str_res)
+    return res
 
 
 # convert symbols in sequences using vocabulary
-def convert_sequences(vocabulary, sequences):
-    pass
+def translate(sequences, vocabulary):
+    res = dict()
+    for itm in sequences.items():
+        res[itm[0]] = list()
+        for seq in itm[1]:
+            tks = [int(x) for x in seq.split(" ")]
+            sym = " ".join(np.array(vocabulary)[tks])
+            res[itm[0]].append(sym)
+    return res
 
 
 # detect input seqs using token and patter vocabs
