@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import json
 import random
 import numpy as np
 import pprint
@@ -28,72 +28,75 @@ class Params:
 def _key_selector(x):
     return len(x)
 
-
-# calculates frequency (occ./tot) of each ngram, as single set
-def ngram_freq(seqs, order_limit=6):
-    """
-    This function computes overall frequencies for ngrams up to order-limit in seqs
-
-    ...
-
-    Parameters
-    ----------
-    seqs : matrix
-        a 2D-array of integers
-    order_limit : int
-        the maximum ngram length calculated
-    """
-
-    dic = dict()
-    for order in range(order_limit):
-        _shape = (max(max(seqs)) + 1,) * (order + 1)
-        m = np.zeros(_shape)
-        dic[order] = {}
-        for arr in seqs:
-            for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
-                m[_ind] += 1
-        # divide all m by the sum
-        m = np.divide(m, m.sum())
-        for tt in zip(np.array(np.nonzero(m)).T):
-            idx = "".join(str(e) for e in tt).strip('[]')
-            dic[order][idx] = float(m[tuple(tt[0])])
-
-    return dic
-
-
-# calculates frequency (occ./tot) foreach ngram, foreach line
-def ngram_freq_per_line(seqs, order_limit=6):
-    """
-    This function computes frequencies, for each line, for ngrams up to order-limit in seqs
-
-    ...
-
-    Parameters
-    ----------
-    seqs : matrix
-        a 2D-array of integers
-    order_limit : int
-        the maximum ngram length calculated
-    """
-
-    dic = dict()
-    for order in range(order_limit):
-        dic[order] = dict()
-        for arr in seqs:
-            if len(arr) > order:
-                _shape = (max(arr) + 1,) * (order + 1)
-                m = np.zeros(_shape)
-                for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
-                    m[_ind] += 1
-                # divide each cell with the row sum
-                m = (m.T / m.sum()).T
-                for tt in zip(np.array(np.nonzero(m)).T):
-                    idx = "".join(str(e) for e in tt).strip('[]')
-                    dic[order][idx] = float(m[tuple(tt[0])])
-    return dic
+# old fun
+#
+# # calculates frequency (occ./tot) of each ngram, as single set
+# def ngram_freq(seqs, order_limit=6):
+#     """
+#     This function computes overall frequencies for ngrams up to order-limit in seqs
+#
+#     ...
+#
+#     Parameters
+#     ----------
+#     seqs : matrix
+#         a 2D-array of integers
+#     order_limit : int
+#         the maximum ngram length calculated
+#     """
+#
+#     dic = dict()
+#     for order in range(order_limit):
+#         _shape = (max(max(seqs)) + 1,) * (order + 1)
+#         m = np.zeros(_shape)
+#         dic[order] = {}
+#         for arr in seqs:
+#             for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
+#                 m[_ind] += 1
+#         # divide all m by the sum
+#         m = np.divide(m, m.sum())
+#         for tt in zip(np.array(np.nonzero(m)).T):
+#             idx = "".join(str(e) for e in tt).strip('[]')
+#             dic[order][idx] = float(m[tuple(tt[0])])
+#
+#     return dic
+#
+#
+# # calculates frequency (occ./tot) foreach ngram, foreach line
+# def ngram_freq_per_line(seqs, order_limit=6):
+#     """
+#     This function computes frequencies, for each line, for ngrams up to order-limit in seqs
+#
+#     ...
+#
+#     Parameters
+#     ----------
+#     seqs : matrix
+#         a 2D-array of integers
+#     order_limit : int
+#         the maximum ngram length calculated
+#     """
+#
+#     dic = dict()
+#     for order in range(order_limit):
+#         dic[order] = dict()
+#         for arr in seqs:
+#             if len(arr) > order:
+#                 _shape = (max(arr) + 1,) * (order + 1)
+#                 m = np.zeros(_shape)
+#                 for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
+#                     m[_ind] += 1
+#                 # divide each cell with the row sum
+#                 m = (m.T / m.sum()).T
+#                 for tt in zip(np.array(np.nonzero(m)).T):
+#                     idx = "".join(str(e) for e in tt).strip('[]')
+#                     dic[order][idx] = float(m[tuple(tt[0])])
+#     return dic
 
 
 # calculates markov transitional occurrences
+
+
 def markov_trans_occ(seqs, order_limit=6):
     """This function computes transition occurrences dict up to order-limit
 
@@ -167,6 +170,44 @@ def markov_trans_freq(seqs, order_limit=6):
             tot = sum(order[1].values())
             for x in order[1].items():
                 m[order[0]][x[0]] = float(x[1]) / int(tot)
+    return m
+
+    # calculates probabilities of markov transitions
+
+
+# calculates chunk strength markov transitions
+def markov_chunk_strength(seqs, order_limit=6):
+    """This function computes chunk strengths dict up to order-limit
+
+    ...
+
+    Parameters
+    ----------
+    seqs : matrix
+        a 2D-array of string
+    order_limit : int
+        the maximum ngram length calculated
+    """
+    cto = markov_trans_occ(seqs, order_limit)
+    m = dict()
+    for itm in cto.items():
+        order = list(itm)
+        m[order[0]] = dict()
+        if order[0] > 0:
+            # higher orders
+            for itm2 in order[1].items():
+                tpo = list(itm2)
+                m[order[0]][tpo[0]] = dict()
+                tot = sum(tpo[1].values())
+                for x in tpo[1].items():
+                    # chunk strength
+                    m[order[0]][tpo[0]][x[0]] = float(x[1] - ((int(tot) - x[1]) * 0.5))
+        else:
+            # 0th-order has no transitions
+            tot = sum(order[1].values())
+            for x in order[1].items():
+                # chunk strength
+                m[order[0]][x[0]] = float(x[1] - ((int(tot) - x[1]) * 0.5))
     return m
 
 
@@ -438,7 +479,7 @@ def mc_choice(arr):
     return ind
 
 
-# from tokens and patterns, generates (occ) sequences starting from initial symbol
+# from transition probabilities, generates (occ) sequences
 def generate(tps, n_seq, occ_per_seq=16):
     res = dict()
     for order in tps.keys():
@@ -453,22 +494,27 @@ def generate(tps, n_seq, occ_per_seq=16):
         else:
             for _ns in range(0, n_seq):
                 # first choice
-                keys = list(tps[order].keys())
-                str_res = random.choice(keys)
+                str_res = random.choice(list(tps[order].keys()))
                 sid = str_res
                 # all other occs
                 for _ops in range(0, occ_per_seq - order):
                     #  ending symbol, no further nth-order transition
                     # cut first symbol and search for the order-1 transition
                     i = 0
-                    while i < order and sid not in tps[order - i].keys():
+                    while i < order and (sid not in tps[order - i].keys()):
                         sid = " ".join(sid.split(" ")[1:])
                         i += 1
-                        if i == order:
-                            print("ERRORORORROROROROR")
-                    val = tps[order - i][sid]
-                    idx = mc_choice(list(val.values()))
-                    str_res += " " + list(val.keys())[idx]
+
+                    if sid:
+                        val = tps[order - i][sid]
+                        idx = mc_choice(list(val.values()))
+                        str_res += " " + list(val.keys())[idx]
+                    else:
+                        # choose a symbol of the 0-th level
+                        idx = mc_choice(list(tps[0].values()))
+                        val = list(tps[0].keys())[idx]
+                        str_res += " " + val
+
                     sid = " ".join(str_res.split(" ")[-order:])
                 res[order].append(str_res)
     return res
@@ -489,3 +535,39 @@ def translate(sequences, vocabulary):
 # detect input seqs using token and patter vocabs
 def detect(seqs, token_voc, pattern_voc, ):
     pass
+
+
+# serialize sets as list
+def serialize_sets(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    return obj
+
+
+# -------------------------------------------------------------------------
+# call fun
+def compute(seqs, dir_name, filename, ):
+    # compute transitions frequencies
+    tf = markov_trans_freq(seqs)
+    # ...or chunk strength
+    # tf = markov_chunk_strength(seqs)
+    # rewrite seqs with tf
+    tf_seqs = detect_transitions(seqs, tf)
+    # tokenize seqs
+    chunks = chunk_sequences(seqs, tf_seqs)
+    vocab = dict_to_array(chunks)
+    detected = chunks_detection(seqs, chunks)
+    # write
+    with open(dir_name + filename + "_tf.json", "w") as fp:
+        json.dump(tf, fp)
+    with open(dir_name + filename + "_tf_seqs.json", "w") as fp:
+        json.dump(tf_seqs, fp)
+    with open(dir_name + filename + "_chunks.json", "w") as fp:
+        json.dump(chunks, fp, default=serialize_sets)
+    with open(dir_name + filename + "_vocab.json", "w") as fp:
+        json.dump(vocab, fp)
+    with open(dir_name + filename + "_detected.json", "w") as fp:
+        json.dump(detected, fp)
+    return tf, tf_seqs, chunks, vocab, detected
+
+

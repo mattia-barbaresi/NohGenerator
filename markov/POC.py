@@ -6,38 +6,18 @@ import os
 import complexity
 
 
-# --------------------------------------------------functions
-# call fun
-def compute(seqs, dir_name, filename):
-    # compute transitions frequencies
-    tf = markov.markov_trans_freq(seqs)
-    # rewrite seqs with tf
-    tf_seqs = markov.detect_transitions(seqs, tf)
-    # tokenize seqs
-    chunks = markov.chunk_sequences(seqs, tf_seqs)
-    vocab = markov.dict_to_array(chunks)
-    detected = markov.chunks_detection(seqs, chunks)
-    # write
-    with open(dir_name + filename + "_tf.json", "w") as fp:
-        json.dump(tf, fp)
-    with open(dir_name + filename + "_tf_seqs.json", "w") as fp:
-        json.dump(tf_seqs, fp)
-    with open(dir_name + filename + "_chunks.json", "w") as fp:
-        json.dump(chunks, fp, default=serialize_sets)
-    with open(dir_name + filename + "_vocab.json", "w") as fp:
-        json.dump(vocab, fp)
-    with open(dir_name + filename + "_detected.json", "w") as fp:
-        json.dump(detected, fp)
-    return tf, chunks, vocab, detected
+# convert fun
+def dict_to_arr(tkn_dict):
+    res = []
+    for pat in tkn_dict.items():
+        # convert dictionary levels in array
+        for sq in pat[1]:
+            if sq:
+                res.append(list(str(x) for x in sq))
+    return res
 
 
-# serialize sets
-def serialize_sets(obj):
-    if isinstance(obj, set):
-        return list(obj)
-    return obj
-
-
+# ----------------------------------------------------------
 # init, input, output
 pp = pprint.PrettyPrinter(indent=2)
 file_in = "markov/input.txt"
@@ -47,42 +27,30 @@ sequences = markov.read_from_file(file_in, "")
 new_seqs = sequences
 
 # compute tokens
-tkn_tf, tokens, token_vocabulary, tokenized = compute(sequences, dir_out, "tokens")
-
+tkn_tf, tkn_tf_seq, tokens, token_vocabulary, tokenized = markov.compute(sequences, dir_out, "tokens")
 # convert tokenized to arr
-arr = []
-for pat in tokenized.items():
-    # convert dictionary levels in array
-    for sq in pat[1]:
-        if sq:
-            arr.append(list(str(x) for x in sq))
-
+arr = dict_to_arr(tokenized)
 # compute patterns
-pat_tf, patterns, pattern_vocabulary, patternized = compute(arr, dir_out, "patterns")
+pat_tf, pat_tf_seq, patterns, pattern_vocabulary, patternized = markov.compute(arr, dir_out, "patterns")
 
 
-# generation
+# generate new sequences
 generated = markov.generate(pat_tf, 10)
-
-t1 = markov.translate(generated,pattern_vocabulary)
-t2 = markov.translate(t1,token_vocabulary)
-
-with open(dir_out + "generated.json", "w") as fp:
-    json.dump(generated, fp, default=serialize_sets)
-with open(dir_out + "translated.json", "w") as fp:
-    json.dump(t1, fp, default=serialize_sets)
-with open(dir_out + "translated_2.json", "w") as fp:
-    json.dump(t2, fp, default=serialize_sets)
+# translate to tokens
+t2 = markov.translate(generated, token_vocabulary)
 
 # output  and to console
-# markov.write_tp_file("tokens.txt",tf_seqs,sequences)
-# print(" ----------------")
-# markov.write_tp_file("tokenized.txt",tf_tok_seq,arr)
-
 # print (" ----------------")
 # print ("results:")
 # print (json.dumps(res, indent=4, sort_keys=True))
 
 # write
-# markov.write_tp_file(dir_out + "blabla",tf_seqs,sequences, False)
-# markov.write_tp_file(dir_out + "blabla",tf_tok_seq,arr, False)
+# markov.write_tp_file(dir_out + "blabla",tkn_tf_seq,sequences, False)
+# markov.write_tp_file(dir_out + "blabla",pat_tf_seq,,arr, False)
+with open(dir_out + "generated.json", "w") as fp:
+    json.dump(generated, fp, default=markov.serialize_sets)
+with open(dir_out + "translated.json", "w") as fp:
+    json.dump(t2, fp, default=markov.serialize_sets)
+
+
+
