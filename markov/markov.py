@@ -125,6 +125,7 @@ def markov_trans_occ(seqs, order_limit=6):
                     m[val] = 1
             # count last-word transitions in n-grams
             for tt in m.items():
+                # warning: double spaces give an error!
                 t1 = (tt[0].split(" "))
                 if len(t1) > 1:
                     i1 = ' '.join(t1[:-1])  # trim last char
@@ -455,7 +456,7 @@ def read_from_file(file_name, separator=" "):
         the name of the file to read
     """
     lst = []
-    with open(file_name, encoding="utf8") as fp:
+    with open(file_name) as fp:
         for line in fp:
             if separator == "":
                 a = list(line.strip())
@@ -504,7 +505,6 @@ def generate(tps, n_seq, occ_per_seq=16):
                     while i < order and (sid not in tps[order - i].keys()):
                         sid = " ".join(sid.split(" ")[1:])
                         i += 1
-
                     if sid:
                         val = tps[order - i][sid]
                         idx = mc_choice(list(val.values()))
