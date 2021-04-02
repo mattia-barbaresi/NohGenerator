@@ -6,69 +6,96 @@ import markov
 import os
 import complexity
 from shutil import copyfile
+import utils
+import networkx as nx
 
-
-# convert fun
-def dict_to_arr(tkn_dict):
-    res = []
-    for pat in tkn_dict.items():
-        # convert dictionary levels in array
-        for sq in pat[1]:
-            if sq:
-                res.append(list(str(x) for x in sq))
-    return res
-
-
-# ----------------------------------------------------------
 # init, input, output
 pp = pprint.PrettyPrinter(indent=2)
-file_in = "input/input.txt"
-dir_out = "markov/results_" + datetime.now().strftime("%Y%m%d-%H.%M") + "/"
+file_in = "markov/input/input.txt"
+dir_out = "markov/results_" + datetime.now().strftime("%Y%m%d-%H.%M.%S") + "/"
 os.mkdir(dir_out)
-copyfile(file_in, dir_out+"input.txt")
-sequences = markov.read_from_file(file_in, " ")
-new_seqs = sequences
+copyfile(file_in, dir_out + "input.txt")
+# read
+sequences = markov.read_from_file(file_in, "")
+# sequences_reversed = markov.read_from_file(file_in, " ", reverse=True)
 start_time = time.time()
+
+##################################################################
+# complexity
+w = []
+for sq in sequences:
+    w.extend(sq)
+
+results = dict()
+results["entropy"] = complexity.entropy(w)
+results["block_entropy_2"] = complexity.block_entropy(w,2)
+results["block_entropy_3"] = complexity.block_entropy(w,3)
+results["entropy_rate"] = complexity.entropy_rate(w)
+results["predictive_information"] = complexity.predictive_information(w)
+results["mutual_information(x,x+1)"] = complexity.mutual_information(w[:-1],w[1:])
+
+with open(dir_out + "stats.json", "w") as fp:
+    json.dump(results, fp, default=markov.serialize_sets, ensure_ascii=False)
+##################################################################
+
+# # chunk strength
+# tf = markov.markov_chunk_strength(sequences)
+# res = dict()
+# res2 = []
+# pp.pprint(tf)
+# print("---")
+# for it in tf.items():
+#     if it[0] == 0:
+#         res[0] = sorted(it[1].items(), key=lambda item: float(item[1]), reverse=True)
+#     else:
+#         res[it[0]] = dict()
+#         for obj in it[1].items():
+#             res[it[0]][obj[0]] = sorted(obj[1].items(), key=lambda item: float(item[1]), reverse=True)
+#         # res2.res[it[0]]
+# pp.pprint(res)
+
+
 # compute tokens
 tkn_tf, tkn_tf_seq, tokens, token_vocabulary, tokenized = markov.compute(sequences, dir_out, "tokens")
 # convert tokenized to arr
-arr = dict_to_arr(tokenized)
+arr = utils.dict_to_arr(tokenized)
+
 # compute patterns
 pat_tf, pat_tf_seq, patterns, pattern_vocabulary, patternized = markov.compute(arr, dir_out, "patterns")
 tf = pat_tf
 vocabulary = token_vocabulary
 
-# --------------------------------
-# generate in a loop
-# arr = sequences
-# vocab = []
-# for _i in range(2):
-#     # compute tokens
-#     vocabulary = vocab
-#     tf, tf_seq, segments, vocab, seg_seqs = markov.compute(arr, dir_out, "gen_" + str(_i))
-#     # convert tokenized to arr
-#     arr = dict_to_arr(seg_seqs)
-# --------------------------------
-
 # generate new sequences
-generated = markov.generate(tf, 10)
+generated = markov.generate(tf, 30, occ_per_seq=10)
 # translate to tokens
 t2 = markov.translate(generated, vocabulary)
-
+#
 with open(dir_out + "generated.json", "w") as fp:
     json.dump(generated, fp, default=markov.serialize_sets)
 with open(dir_out + "translated.json", "w") as fp:
     json.dump(t2, fp, default=markov.serialize_sets, ensure_ascii=False)
 
+
+# # compute and generate in loop
+# loop_seqs = sequences
+# for x in range(0,10):
+#     _tf, _tf_seq, _tokens, _vocabulary, _tokenized = markov.compute(loop_seqs, write_to_file=False)
+#     loop_seqs = utils.dict_to_arr(_tokenized)
+#     _tf2, _tf_seq2, _tokens2, _vocabulary2, _tokenized2 = markov.compute(loop_seqs, write_to_file=False)
+#     _gen = markov.generate(_tf2, 10, occ_per_seq=10)
+#     loop_seqs = utils.generated_to_arr(markov.translate(_gen, _vocabulary))
+#
+# pp.pprint(loop_seqs)
+
+
 # output  and to console
-# print (" ----------------")
-# print ("results:")
 print("time elapsed :", time.time() - start_time)
-# print (json.dumps(res, indent=4, sort_keys=True))
 
-# write
-# markov.write_tp_file(dir_out + "blabla",tkn_tf_seq,sequences, False)
-# markov.write_tp_file(dir_out + "blabla",pat_tf_seq,,arr, False)
-
-
+# # for drawing graphs
+# for ind,item in tkn_tf.items():
+#     if ind > 0:
+#         G = nx.DiGraph()
+#         for it in item:
+#             G.add_edges_from([(it[0],k[0]) for k in it])
+#         nx.draw(G)
 
