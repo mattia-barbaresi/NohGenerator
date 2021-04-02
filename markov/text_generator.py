@@ -24,7 +24,7 @@ def matrix_generator(n):
     return result
 
 
-def generate(trans_mtx, n_occ, start_index=-1):
+def generate(trans_mtx, n_occ, start_index=-1, vocab=vocabulary):
     """
     Given a transition probability matrix generates text of given length n_occ,
     starting from the specified start_index, random otherwise.
@@ -32,17 +32,16 @@ def generate(trans_mtx, n_occ, start_index=-1):
     random.seed()
     ind = start_index
     if start_index < 0:
-        ind = random.randint(0, len(vocabulary)-1)
-    res = str(vocabulary[ind])
+        ind = random.randint(0, len(vocab) - 1)
+    res = str(vocab[ind])
     for i in range(0, n_occ - 1):
         rnd = random.uniform(0, 1)
         sm = 0
         j = 0
-        fnd = False
-        while sm < rnd and j < len(vocabulary):
+        while sm < rnd and j < len(vocab):
             sm += trans_mtx[ind][j]
             if sm > rnd:
-                res += vocabulary[j]
+                res += vocab[j]
                 ind = j
             j += 1
     print(res)
@@ -55,6 +54,17 @@ mtx = [[0.0, 0.33, 0.33, 0.34],
        [0.33, 0.0, 0.33, 0.34],
        [0.33, 0.33, 0.0, 0.34],
        [0.33, 0.33, 0.34, 0.0]]
-pp.pprint(mtx)
+# pp.pprint(mtx)
+# for q in range(0, 50):
+#     generate(mtx, 16)
+
+
+pp = pprint.PrettyPrinter(indent=2)
+vocab = ["a", "b", "c", "d", "e"]
+mtx = [[0.0, 0.1, 0.9, 0.0, 0.0],  # a
+       [0.0, 0.0, 0.1, 0.1, 0.6],  # b
+       [0.0, 0.0, 0.0, 1.0, 0.0],    # c
+       [1.0, 0.0, 0.0, 0.0, 0.0],  # d
+       [0.0, 0.5, 0.0, 0.0, 0.5]]  # e
 for q in range(0, 50):
-    generate(mtx, 16)
+    generate(mtx, 20, vocab=vocab)
