@@ -1,40 +1,35 @@
 import os
+import time
 
 from genetic_algorithm import constants
 from utils import json_editor
-from nao_libs.common import sendToRobot, MoveForward, MoveBackward, Rotate
-
-
-def read_and_move(filename, t):
-    print "figure: " + filename
-    list_angles = json_editor.read_dict(
-        os.path.dirname(os.path.abspath(__file__)).rsplit("/")[0] + "/" + filename)
-    sendToRobot.sendrobot(list_angles, t)
+from nao_libs.common import robot_proxy
 
 
 def reproduce(sequence):
-    t = 1
-    sendToRobot.initialize()
     for pose in sequence:
-        # print Constants.LIST_OF_MOVES[x]
+        print pose + " : " + constants.LIST_OF_MOVES[pose]
         if pose == "z":
-            MoveForward.move_forward(t)
+            robot_proxy.move_forward()
         elif pose == "y":  # z and y are the walk and the rotation
-            MoveBackward.move_backward(t)
+            robot_proxy.move_backward()
         elif pose == "x":
-            Rotate.rotate_left(t)
+            robot_proxy.rotate_left()
         elif pose == "w":
-            Rotate.rotate_right(t)
+            robot_proxy.rotate_right()
         else:
-            read_and_move(constants.LIST_OF_MOVES[pose], t)
+            list_angles = json_editor.read_dict(
+                os.path.dirname(os.path.abspath(__file__)).rsplit("/")[0] + "/" + constants.LIST_OF_MOVES[pose])
+            # send command to robot
+            robot_proxy.send_robot(list_angles)
+            time.sleep(2)
 
 
 os.chdir("/")
-chor = "awhzsnxpyabtxdjj"
+# chor = "abcdefghijklmnopqrstuvwxyz"
+chor = "zqtghyrt"
 print "Reproducing... " + chor
+robot_proxy.initialize()
 reproduce(chor)
-# reproduce("abcdefghijklmnopqrstuvwxyz")
-frequency = 2500  # Set Frequency To 2500 Hertz
-duration = 1000  # Set Duration To 1000 ms == 1 second
-# winsound.Beep(frequency, duration)
+robot_proxy.stop()
 print "Execution finished"

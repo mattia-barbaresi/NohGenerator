@@ -3,7 +3,8 @@ import math
 import bcolors
 
 
-def angleRShoulderPitch(x2, y2, z2, x1, y1, z1): #calulates the Shoulderpitch value for the Right shoulder by using geometry
+def angleRShoulderPitch(x2, y2, z2, x1, y1, z1):
+    # calulates the Shoulderpitch value for the Right shoulder by using geometry
     print bcolors.BLUE + "angleRShoulderPitch" + bcolors.ENDC
     angle = math.atan2((y2 - y1), (z2 - z1)) # obtain the angle between shoulder and elbow
     angle = math.degrees(angle)
@@ -22,7 +23,8 @@ def angleRShoulderPitch(x2, y2, z2, x1, y1, z1): #calulates the Shoulderpitch va
     print bcolors.OKMSG + "angle rshoulder pitch " + str(angle) + bcolors.ENDC
     return - angle
 
-def angleRShoulderRoll(x2, y2, z2, x1, y1, z1): #calulates the ShoulderRoll value for the Right shoulder by using geometry
+def angleRShoulderRoll(x2, y2, z2, x1, y1, z1):
+    # calulates the ShoulderRoll value for the Right shoulder by using geometry
     print bcolors.BLUE + "angleRShoulderRoll" + bcolors.ENDC
     angle = math.atan2((x2 - x1) , (z2 - z1))
     angle = math.degrees(angle)
