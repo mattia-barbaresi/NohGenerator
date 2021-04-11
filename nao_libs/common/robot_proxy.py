@@ -119,6 +119,6 @@ def send_robot(angle_list):
         names.append(str(name))
         al.append(float(angle_list["angles"][name]) * almath.TO_RAD)
     motion_proxy.stopMove()
-    motion_proxy.angleInterpolationWithSpeed(names, al, 0.15)  # the function talks with the robot
+    motion_proxy.angleInterpolationWithSpeed(names, al, 0.1)  # the function talks with the robot
 
 

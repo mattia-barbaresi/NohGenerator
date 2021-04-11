@@ -27,7 +27,7 @@ def reproduce(sequence):
 
 os.chdir("/")
 # chor = "abcdefghijklmnopqrstuvwxyz"
-chor = "zqtghyrt"
+chor = "zrqtghyrt"
 print "Reproducing... " + chor
 robot_proxy.initialize()
 reproduce(chor)
