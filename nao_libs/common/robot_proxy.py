@@ -1,6 +1,6 @@
 import math
 import time
-
+import threading
 import motion
 from naoqi import ALProxy
 import almath
@@ -28,11 +28,30 @@ class Proxies(object):
                 print "Error was: ", e
         return [cls._motion_proxy, cls._posture_proxy]
 
+# deferred stop
+def set_interval(interval):
+    def decorator(function):
+        def wrapper(*args, **kwargs):
+            stopped = threading.Event()
+
+            def loop():  # executed in another thread
+                while not stopped.wait(interval):  # until stopped
+                    function(*args, **kwargs)
+
+            t = threading.Thread(target=loop)
+            t.daemon = True  # stop if the program exits
+            t.start()
+            return stopped
+
+        return wrapper
+
+    return decorator
+
 
 def initialize():
     motion_proxy, posture_proxy = Proxies()
     stiffness_on(motion_proxy)
-    posture_proxy.goToPosture("StandInit", 0.8)
+    posture_proxy.goToPosture("StandInit", 0.5)
     motion_proxy.waitUntilMoveIsFinished()
     motion_proxy.setMoveArmsEnabled(False, False)
     # gets the robot into his initial standing position
@@ -59,12 +78,21 @@ def initialize():
     #                                   axisMask, times, isAbsolute)
 
 
+@set_interval(15)
+def deferred_stop():
+    motion_proxy, posture_proxy = Proxies()
+    # End Walk
+    motion_proxy.stopMove()
+    motion_proxy.waitUntilMoveIsFinished()
+
+
 def stop():
     motion_proxy, posture_proxy = Proxies()
     # End Walk
     motion_proxy.move(0, 0, 0)
     motion_proxy.stopMove()
     motion_proxy.waitUntilMoveIsFinished()
+    posture_proxy.goToPosture("StandInit", 0.5)
 
 
 def stiffness_on(proxy):
@@ -80,16 +108,18 @@ def move_forward():
     motion_proxy.move(0, 0, 0)
     motion_proxy.waitUntilMoveIsFinished()
     motion_proxy.moveToward(0.5, 0.0, 0.0, constants.GAIT_STYLE)
-    time.sleep(4)
+    deferred_stop()
+    # time.sleep(4)
     # motion_proxy.stopMove()
 
 
 def move_backward():
     motion_proxy, posture_proxy = Proxies()
-    motion_proxy.move(0,0,0)
+    motion_proxy.move(0, 0, 0)
     motion_proxy.waitUntilMoveIsFinished()
     motion_proxy.moveToward(-0.5, 0.0, 0.0, constants.GAIT_STYLE)
-    time.sleep(4)
+    deferred_stop()
+    # time.sleep(4)
     # motion_proxy.stopMove()
 
 
@@ -98,7 +128,7 @@ def rotate_left():
     motion_proxy.move(0, 0, 0)
     motion_proxy.waitUntilMoveIsFinished()
     motion_proxy.moveTo(0.0, 0.0, math.pi / 2, constants.GAIT_STYLE)
-    time.sleep(4)
+    # time.sleep(4)
     # motion_proxy.stopMove()
 
 
@@ -107,7 +137,7 @@ def rotate_right():
     motion_proxy.move(0, 0, 0)
     motion_proxy.waitUntilMoveIsFinished()
     motion_proxy.moveTo(0.0, 0.0, -math.pi / 2, constants.GAIT_STYLE)
-    time.sleep(4)
+    # time.sleep(4)
     # motion_proxy.stopMove()
 
 
@@ -118,7 +148,5 @@ def send_robot(angle_list):
     for name in angle_list["angles"]:
         names.append(str(name))
         al.append(float(angle_list["angles"][name]) * almath.TO_RAD)
-    motion_proxy.stopMove()
+    # motion_proxy.stopMove()
     motion_proxy.angleInterpolationWithSpeed(names, al, 0.1)  # the function talks with the robot
-
-
