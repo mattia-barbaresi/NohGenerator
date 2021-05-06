@@ -3,6 +3,7 @@ import json
 import random
 import numpy as np
 import pprint
+import form_class as fc
 from collections import OrderedDict
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -49,6 +50,8 @@ def ngram_occurrences(seqs, order_limit=6, sort=True):
         a list of sequences
     order_limit : int
         the maximum ngram length calculated
+    sort: bool
+        if True, sort results
     """
 
     dic = dict()
@@ -305,6 +308,50 @@ def chunk_sequences(seqs, mtp, ord_max=6):
     return cl
 
 
+# chunking sequences
+def chunk_sequences_only_sure(seqs, mtp, ord_max=6):
+    """
+    Returns segments/chunks of seqs extracted using mtp transitions
+
+    ...
+
+    Parameters
+    ----------
+    seqs : matrix
+        list of sequences to analyze
+    mtp : dict
+        the transitional probabilities dictionary
+    ord_max : int
+        max level/order in dict
+    """
+    cl = dict()
+    # cl = set()
+    for order in range(1, ord_max):  # ignore 0th-order
+        cl[order] = set()
+        i = 0
+        for x in mtp[order]:
+            cks = ""
+            j = 0
+            while j < len(x):
+                if str(x[j]) == "-" or float(x[j]) >= 0.98:
+                    # concat new char
+                    cks = cks + " " + str(seqs[i][j])
+                else:
+                    # add founded chunk, if any
+                    if len(cks.strip(" ").split(" ")) > 1:
+                        cks = cks.strip(" ")
+                        if cks.strip(" ") == "f":
+                            print ("m")
+                        cl[order].add(cks)
+                        # cl.add(cks)
+                    # start new chunk
+                    cks = str(seqs[i][j])
+                j = j + 1
+            cks = cks.strip(" ")
+            i = i + 1
+    return cl
+
+
 def chunk_recognition(bag, voc, sq):
     """
     Return the list of token (in bag) that match sq
@@ -328,7 +375,6 @@ def chunk_recognition(bag, voc, sq):
             i = i + len(voc[ind].split(" "))
         else:
             i = i + 1
-        # if search_str is not empty, detection has failed
     return arr
 
 
@@ -439,37 +485,7 @@ def write_tp_file(path, tps, seqs, console=True):
                 fp.write(vl + "\n")
 
 
-# reads list of sequences from file
-def read_from_file(file_name, separator=" ", reverse=False):
-    """
-    Read a list of strings and split into tokens using separator.
-
-    ...
-
-    Parameters
-    ----------
-    separator : str
-        separator between tokens, used to split sequences
-    file_name : str
-        the name of the file to read
-    reverse: bool
-        reversed sequences
-    """
-
-    lst = []
-    with open(file_name) as fp:
-        for line in fp:
-            if separator == "":
-                a = list(line.strip())
-            else:
-                a = line.strip().split(separator)
-            if a:
-                if reverse:
-                    a.reverse()
-                lst.append(a)
-    return lst
-
-
+# return an index using MonteCarlo choice on arr
 def mc_choice(arr):
     rnd = random.uniform(0, 1)
     sm = arr[0]
@@ -547,37 +563,12 @@ def serialize_sets(obj):
     return obj
 
 
-# count class forms
-def form_class(sequences):
-    res = dict()
-    for seq in sequences:
-        for el in seq:
-            if el not in res:
-                res[el] = {"sx": dict(), "dx": dict()}
-                for search_seq in sequences:
-                    values = np.array(search_seq)
-                    for index in np.where(values == el)[0]:
-                        # sx occurrence
-                        if index > 0:
-                            if values[index - 1] in res[el]["sx"]:
-                                res[el]["sx"][values[index - 1]] += 1
-                            else:
-                                res[el]["sx"][values[index - 1]] = 1
-                        # dx occurrence
-                        if index < len(values) - 1:
-                            if values[index + 1] in res[el]["dx"]:
-                                res[el]["dx"][values[index + 1]] += 1
-                            else:
-                                res[el]["dx"][values[index + 1]] = 1
-    return res
-
-
 # -------------------------------------------------------------------------
 # call fun
 def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     # compute transitions frequencies
     tf = markov_trans_freq(seqs)
-    # count occurrences
+    # count ngrams occurrences
     ngrams = ngram_occurrences(seqs)
 
     # ...or chunk strength
@@ -586,23 +577,16 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     tf_seqs = detect_transitions(seqs, tf)
     # tokenize seqs
     chunks = chunk_sequences(seqs, tf_seqs)
+    chunks_sure = chunk_sequences_only_sure(seqs, tf_seqs)
     vocab = dict_to_vocab(chunks)
     detected = chunks_detection(seqs, chunks)
     #########################################################################
     # form class
     detected2 = chunks_detection(seqs, chunks, write_fun=chunk_segmentation)
-    fc = form_class(detected2[2])
-    print("---- ",filename)
-    pp.pprint(fc)
-    first_set = []
-    last_set = []
-    for word in fc.items():
-        if not word[1]['sx']:
-            first_set.append(word[0])
-        if not word[1]['dx']:
-            last_set.append(word[0])
-    print(first_set)
-    print(last_set)
+    dc = fc.distributional_context(detected2[3],3)
+    # print("---- dc ---- ")
+    # pp.pprint(dc)
+    fc.form_classes(dc)
     #########################################################################
     # write
     if write_to_file:
@@ -612,10 +596,14 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
             json.dump(tf_seqs, fp)
         with open(dir_name + filename + "_chunks.json", "w") as fp:
             json.dump(chunks, fp, default=serialize_sets)
+        with open(dir_name + filename + "_chunks_sure.json", "w") as fp:
+            json.dump(chunks_sure, fp, default=serialize_sets)
         with open(dir_name + filename + "_vocab.json", "w") as fp:
             json.dump(vocab, fp)
         with open(dir_name + filename + "_detected.json", "w") as fp:
             json.dump(detected, fp)
         with open(dir_name + filename + "_ngrams.json", "w") as fp:
             json.dump(ngrams, fp, )
-    return tf, tf_seqs, chunks, vocab, detected
+        with open(dir_name + filename + "_form_classes.json", "w") as fp:
+            json.dump(dc, fp)
+    return tf, tf_seqs, chunks_sure, vocab, detected
