@@ -76,13 +76,17 @@ def dot_product(arr, brr):
     size = min(len(arr), len(brr))
     # Traverse the array
     for i in range(size):
-        product = product + arr[i] * brr[i]
+        product = product + (arr[i] * brr[i])
 
     # Return the product
     return product
 
 
 def angle_from_vector(arr, brr):
+    angle = math.pi
+    if len(arr) == len(brr) == 0:
+        return 0  # empty arrays are equal
+
     # Stores dot product of two vectors
     dp = dot_product(arr, brr)
 
@@ -93,16 +97,20 @@ def angle_from_vector(arr, brr):
     magnitude_b = magnitude(brr)
 
     # Stores angle between given vectors
-    angle = math.acos(dp / (magnitude_a * magnitude_b))
+    val = dp / (magnitude_a * magnitude_b)
+    # round error fix
+    if 1 - val <= 0.0001:
+        val = 1
+    angle = math.acos(val)
 
     # Print the angle
-    print('%.5f' % angle)
+    # print('%.5f' % angle)
     return angle
 
 
 def angle_from_dict(adict, bdict):
     # if contexts have same values, calculate angle
     if np.array_equal(adict.keys(),bdict.keys()):
-        return angle_from_vector(adict.values(),bdict.values())
+        return angle_from_vector(list(adict.values()),list(bdict.values()))
     else:
-        return -1
+        return math.pi
