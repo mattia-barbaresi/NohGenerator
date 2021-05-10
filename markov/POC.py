@@ -11,15 +11,27 @@ import networkx as nx
 
 # init, input, output
 pp = pprint.PrettyPrinter(indent=2)
-file_in = "markov/input/input.txt"
+file_in = "markov/input/haiku.txt"
+sep = ""
 dir_out = "markov/results_" + datetime.now().strftime("%Y%m%d-%H.%M.%S") + "/"
 os.mkdir(dir_out)
 copyfile(file_in, dir_out + "input.txt")
 # read
-sequences = markov.read_from_file(file_in, "")
-# sequences_reversed = markov.read_from_file(file_in, " ", reverse=True)
+sequences = utils.read_from_file(file_in, sep)
+seqs_reversed = utils.read_from_file(file_in, sep, reverse=True)
 start_time = time.time()
 
+
+##################################################################
+# for epsilon_machine analysis
+alf = set()
+for s in sequences:
+    for si in s:
+        alf.add(si)
+
+with open(dir_out + "alf.txt", "w") as fp:
+    for i in alf:
+        fp.write(i + " ")
 ##################################################################
 # complexity
 w = []
@@ -57,23 +69,26 @@ with open(dir_out + "stats.json", "w") as fp:
 
 # compute tokens
 tkn_tf, tkn_tf_seq, tokens, token_vocabulary, tokenized = markov.compute(sequences, dir_out, "tokens")
+# tkn_tf_r, tkn_tf_seq_r, tokens_r, tkn_vocabulary_r, tokenized_r = markov.compute(seqs_reversed, dir_out, "tokens_rev")
 # convert tokenized to arr
-arr = utils.dict_to_arr(tokenized)
+# arr = utils.dict_to_arr(tokenized)
+# print("--- tokenized")
+# pp.pprint(arr)
+# print("-----------------------")
 
 # compute patterns
-pat_tf, pat_tf_seq, patterns, pattern_vocabulary, patternized = markov.compute(arr, dir_out, "patterns")
-tf = pat_tf
-vocabulary = token_vocabulary
-
-# generate new sequences
-generated = markov.generate(tf, 30, occ_per_seq=10)
-# translate to tokens
-t2 = markov.translate(generated, vocabulary)
+# pat_tf, pat_tf_seq, patterns, pattern_vocabulary, patternized = markov.compute(arr, dir_out, "patterns")
+# tf = pat_tf
+# vocabulary = token_vocabulary
 #
-with open(dir_out + "generated.json", "w") as fp:
-    json.dump(generated, fp, default=markov.serialize_sets)
-with open(dir_out + "translated.json", "w") as fp:
-    json.dump(t2, fp, default=markov.serialize_sets, ensure_ascii=False)
+# # generate new sequences
+# generated = markov.generate(tf, 30, occ_per_seq=10)
+# # translate to tokens
+# t2 = markov.translate(generated, vocabulary)
+# with open(dir_out + "generated.json", "w") as fp:
+#     json.dump(generated, fp, default=markov.serialize_sets)
+# with open(dir_out + "translated.json", "w") as fp:
+#     json.dump(t2, fp, default=markov.serialize_sets, ensure_ascii=False)
 
 
 # # compute and generate in loop
@@ -98,4 +113,3 @@ print("time elapsed :", time.time() - start_time)
 #         for it in item:
 #             G.add_edges_from([(it[0],k[0]) for k in it])
 #         nx.draw(G)
-
