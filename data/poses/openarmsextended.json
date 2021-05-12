@@ -1,20 +1,21 @@
 {
-  "supportLeg": "Legs",
-  "angles": {
-    "LShoulderRoll": 25.0,
-    "LShoulderPitch": 60,
-    "LElbowYaw": 10.3,
-    "LElbowRoll": -85.0,
-    "LWristYaw": -25.0,
-    "LHand": 0.5,
+    "supportLeg": "Legs",
+    "angles": {
+      "LElbowRoll": -20,
+      "LElbowYaw": -33,
+      "LShoulderPitch": 50,
+      "LShoulderRoll": 40,
+      "LWristYaw": -9,
+      "LHand": 0,
 
-    "RShoulderRoll": -23,
-    "RShoulderPitch": 60.0,
-    "RElbowRoll": 9.0,
-    "RElbowYaw": 60.0,
-    "RWristYaw": 5,
-    "RHand": 0,
-    "HeadPitch": 0,
-    "HeadYaw": 0
-  }
+      "RElbowRoll": 20,
+      "RElbowYaw": 33,
+      "RShoulderRoll": -40,
+      "RShoulderPitch": 50,
+      "RWristYaw": 94.9,
+      "RHand": 0,
+
+      "HeadPitch": 0,
+      "HeadYaw": 0
+    }
 }

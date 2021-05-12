@@ -6,13 +6,13 @@
     "LElbowRoll": -87.3,
     "LElbowYaw": -30.7,
     "LWristYaw": -59.4,
-    "LHand": 1.0,
+    "LHand": 1,
     "RShoulderRoll": -17.6,
     "RShoulderPitch": -5.9,
     "RElbowRoll": 88.1,
     "RElbowYaw": 30.5,
     "RWristYaw": 59.6,
-    "RHand": 1.0,
+    "RHand": 1,
     "HeadPitch": 35.0,
     "HeadYaw": 0
   }
