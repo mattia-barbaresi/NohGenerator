@@ -7,11 +7,12 @@ from nao_libs.common import robot_proxy
 
 
 def reproduce(sequence):
+    # robot_proxy.turn_head()
     for pose in sequence:
         print pose + " : " + constants.LIST_OF_MOVES[pose]
         if pose == "z":
             robot_proxy.move_forward()
-        elif pose == "y":  # z and y are the walk and the rotation
+        elif pose == "y":
             robot_proxy.move_backward()
         elif pose == "x":
             robot_proxy.rotate_left()
@@ -25,11 +26,45 @@ def reproduce(sequence):
             time.sleep(2)
 
 
+
 os.chdir("/")
 # chor = "abcdefghijklmnopqrstuvwxyz"
-chor = "zrqtghyrt"
-print "Reproducing... " + chor
+chors = ["abcdabefabcgbfea",
+         "hibebajkldaebmda",
+         "ldaebmdabldanoba",
+         "alcibebaebcdaebk",
+         "bmiafbaebcdaebka",
+         "amialdbohpicenla",
+         "aidbieclkdaikdba",
+         "bkldaidlbebaibea",
+         "milkdgjihdbnfbcd",
+         "akfkekaildkhkeba",
+         "edkimbehihopmfba",
+         "bfahbiefkibdhbek",
+         "kedneihbefbhdfke",
+         "hihbcdfabebkldhn",
+         "dpadmqdopqmdejfk",
+         "azrtxwwgxyntzmay",
+         "anbzhiuayvbzubay",
+         "avnevbhzxbwwwzcr",
+         "aljgzrtmydiaklra",
+         "azpxowwqxmnldylm",
+         "abcewhvxfnubzrha"]
+katas = {
+    "open-retreat":"sbyrs",
+    "forward-point":"szbyrs",
+    "backing-point":"syebs",
+    "scooping-point":"swbexbs",
+    "double-sweep":"wfzhxzrybzwzw",
+    "zig-zag":"xmhzwbz",
+    "pivot-to-point":"wezxbx",
+    "weeping-l":"q",
+    "weeping-r":"o",
+    "weeping-both":"p",
+}
+shimai_dance = "zwzyxwezxbxsbyrsxzytqwszbyrssbyrsz"
+print "Reproducing... " + chors[2]
 robot_proxy.initialize()
-reproduce(chor)
+reproduce("ssbyrsza")
 robot_proxy.stop()
 print "Execution finished"
