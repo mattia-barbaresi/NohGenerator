@@ -3,6 +3,8 @@ import json
 import random
 import numpy as np
 import pprint
+
+import complexity
 import form_class as fc
 from collections import OrderedDict
 
@@ -29,7 +31,7 @@ class Params:
     def __init__(self):
         pass
 
-    TSH = 0.5
+    TSH = 0.66
 
 
 # sort key selector function
@@ -92,7 +94,7 @@ def markov_trans_occ(seqs, order_limit=6):
             # read and count n-grams in sequences
             for _ind in zip(*[arr[_x:] for _x in range(order + 1)]):
                 val = " ".join(str(e) for e in _ind)
-                val = val.strip()
+                val = val.strip(" ")
                 if val in m:
                     m[val] = m[val] + 1
                 else:
@@ -341,7 +343,7 @@ def chunk_sequences_only_sure(seqs, mtp, ord_max=6):
                     if len(cks.strip(" ").split(" ")) > 1:
                         cks = cks.strip(" ")
                         if cks.strip(" ") == "f":
-                            print ("m")
+                            print("m")
                         cl[order].add(cks)
                         # cl.add(cks)
                     # start new chunk
@@ -566,11 +568,12 @@ def serialize_sets(obj):
 # -------------------------------------------------------------------------
 # call fun
 def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
+    # create model for generation
+    mdl = create_generation_model(seqs)
     # compute transitions frequencies
     tf = markov_trans_freq(seqs)
     # count ngrams occurrences
     ngrams = ngram_occurrences(seqs)
-
     # ...or chunk strength
     # tf = markov_chunk_strength(seqs)
     # rewrite seqs with tf
@@ -582,14 +585,19 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     detected = chunks_detection(seqs, chunks)
     #########################################################################
     # form class
-    detected2 = chunks_detection(seqs, chunks, write_fun=chunk_segmentation)
-    dc = fc.distributional_context(detected2[3],3)
+    segmented = chunks_detection(seqs, chunks, write_fun=chunk_segmentation)
+    fc_seqs = segmented[3]
+    dc = fc.distributional_context(fc_seqs,3)
     # print("---- dc ---- ")
     # pp.pprint(dc)
-    fc.form_classes(dc)
+    classes = fc.form_classes(dc)
+    class_patt = fc.classes_patterns(classes,fc_seqs)
+
     #########################################################################
     # write
     if write_to_file:
+        with open(dir_name + filename + "_mdl.json", "w") as fp:
+            json.dump(mdl, fp, default=serialize_sets)
         with open(dir_name + filename + "_tf.json", "w") as fp:
             json.dump(tf, fp)
         with open(dir_name + filename + "_tf_seqs.json", "w") as fp:
@@ -602,8 +610,52 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
             json.dump(vocab, fp)
         with open(dir_name + filename + "_detected.json", "w") as fp:
             json.dump(detected, fp)
+        with open(dir_name + filename + "_segmented.json", "w") as fp:
+            json.dump(segmented, fp)
         with open(dir_name + filename + "_ngrams.json", "w") as fp:
             json.dump(ngrams, fp, )
+        with open(dir_name + filename + "_contexts.json", "w") as fp:
+            json.dump(dc, fp, default=serialize_sets)
         with open(dir_name + filename + "_form_classes.json", "w") as fp:
-            json.dump(dc, fp)
+            json.dump(classes, fp, default=serialize_sets)
     return tf, tf_seqs, chunks_sure, vocab, detected
+
+
+def create_generation_model(seqs):
+    cto = markov_trans_occ(seqs)
+    m = dict()
+    t_tot = 0
+    for itm1 in cto.items():
+        if itm1[0] > 0:
+            # higher orders
+            for itm2 in itm1[1].items():
+                vec = itm2[0].split(" ")
+                curr = vec[-1]
+                if curr not in m:
+                    m[curr] = dict()
+                past = ""
+                if len(vec) > 1:
+                    past = " ".join(vec[:-1])
+                m[curr][past] = dict()
+                tot = sum(itm2[1].values())
+                for x in itm2[1].items():
+                    m[curr][past][x[0]] = float(x[1]) / int(tot)
+        else:
+            m["0th"] = dict()
+            # 0th-order has no transitions
+            t_tot = sum(itm1[1].values())
+            for x in itm1[1].items():
+                m["0th"][x[0]] = float(x[1]) / int(t_tot)
+    return m
+
+
+# res = {
+#     "0th": {"a":0.5, "b":0.29 ..}
+#     "a": {
+#         "": { "upon": 0.25, "the": 0.25, "he": 0.5}
+#         "f g": {"w": 2.5, "prob":0.25, "out": {"r":0.2, "g":0.65...}},
+#         "e r t": {"w": 1.5, "prob":0.25, "out": {"r":0.2, "g":0.65...}}
+#     }
+#     "b":
+#     ...
+# }

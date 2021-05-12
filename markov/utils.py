@@ -108,9 +108,9 @@ def angle_from_vector(arr, brr):
     return angle
 
 
-def angle_from_dict(adict, bdict):
+def angle_from_dict(dict_a, dict_b):
     # if contexts have same values, calculate angle
-    if np.array_equal(adict.keys(),bdict.keys()):
-        return angle_from_vector(list(adict.values()),list(bdict.values()))
+    if np.array_equal(dict_a.keys(),dict_b.keys()):
+        return angle_from_vector(list(dict_a.values()),list(dict_b.values()))
     else:
         return math.pi
