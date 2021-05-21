@@ -1,5 +1,4 @@
 from deap import creator, tools
-
 from genetic_algorithm.string_operations import string_similarity
 
 

@@ -58,13 +58,13 @@ katas = {
     "double-sweep":"wfzhxzrybzwzw",
     "zig-zag":"xmhzwbz",
     "pivot-to-point":"wezxbx",
-    "weeping-l":"q",
-    "weeping-r":"o",
+    "weeping-r":"q",
+    "weeping-l":"o",
     "weeping-both":"p",
 }
-shimai_dance = "zwzyxwezxbxsbyrsxzytqwszbyrssbyrsz"
+shimai_dance = "zwzyxwezxbxsbyrsxzytqwszbyrssbyrsza"
 print "Reproducing... " + chors[2]
 robot_proxy.initialize()
-reproduce("ssbyrsza")
+reproduce("q")
 robot_proxy.stop()
 print "Execution finished"

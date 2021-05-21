@@ -1,5 +1,4 @@
 # count pre- and post- occurrences for each word to find form classes
-from collections import OrderedDict
 import numpy as np
 import pprint
 import utils
@@ -7,13 +6,13 @@ import utils
 pp = pprint.PrettyPrinter(indent=2)
 
 # threshold for classes
-THS = 1.0
+THS = 0.85
 
 
 # records pre- and post- lists of words (and the number of occurrences of each of them) that come
 # before and after each word in sequences
 def distributional_context(sequences, order=1):
-    res = OrderedDict()
+    res = dict()
     for seq in sequences:
         for el in seq:
             if el not in res:
@@ -36,9 +35,6 @@ def distributional_context(sequences, order=1):
                                     res[el]["dx"][values[index + i]] += 1
                                 else:
                                     res[el]["dx"][values[index + i]] = 1
-                    # order results
-                    res[el]["dx"] = OrderedDict(sorted(res[el]["dx"].items(), key=lambda x: x[0], reverse=True))
-                    res[el]["sx"] = OrderedDict(sorted(res[el]["sx"].items(), key=lambda x: x[0], reverse=True))
     return res
 
 
