@@ -292,6 +292,10 @@ def chunk_sequences(seqs, mtp, orders=[2,3]):
             j = 0
             while j < len(x):
                 if str(x[j]) == "-" or float(x[j]) >= Params.TSH:
+                # prec = 1.0
+                # if j > 0 and x[j - 1] != "-":
+                #     prec = float(x[j - 1])
+                # if str(x[j]) == "-" or (prec - float(x[j]) >= Params.TSH):
                     cks = cks + " " + str(seqs[i][j])
                 else:
                     if cks != "":
@@ -539,6 +543,7 @@ def generate(tps, n_seq, occ_per_seq=16):
     return res
 
 
+# generate using n-order markov transitions and weights for markov orders
 def generate_with_weights(tps, weights, voc=[], n_seq=1, occ_per_seq=16, start_pool=[]):
     res = []
     # generate n_seq sequences
@@ -566,8 +571,8 @@ def generate_with_weights(tps, weights, voc=[], n_seq=1, occ_per_seq=16, start_p
                 # pick out the right history (past length due to choosen order)
                 sid = " ".join(str_res.split(" ")[-order:])
                 while i < order and (sid not in tps[order - i].keys()):
-                    sid = " ".join(sid.split(" ")[1:])
                     i += 1
+                    sid = " ".join(sid.split(" ")[-(order-i):])
                 if sid and (order - i > 0):
                     val = tps[order - i][sid]
                     idx = mc_choice(list(val.values()))
@@ -656,13 +661,13 @@ def mc_choice_dict(a_dict):
     return ind
 
 
-# def reweight(pool, ws):
+# def reweigh(pool, ws):
 #     res = []
 #     np.multiply(a, w)
 #     out2 = [x / ss for x in out]
 #
-#     return re
-
+#     return res
+#
 #
 # def mdl_generate_with_weights(mdl, weights, noccs, init_pool):
 #     res = []
@@ -673,7 +678,7 @@ def mc_choice_dict(a_dict):
 #         seq = mc_choice_dict(mdl["0th"])
 #     res.append(seq)
 #     # next trans
-#     pool = reweight(mdl[seq], weights)
+#     pool = reweigh(mdl[seq], weights)
 #     for n in range(0,noccs):
 #         res.append()
 #
@@ -690,7 +695,7 @@ def mc_choice_dict(a_dict):
 # call fun
 def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     # create model for generation
-    # mdl = create_generation_model(seqs)
+    mdl = create_generation_model(seqs)
     # compute transitions frequencies
     tf = markov_trans_freq(seqs)
     # count ngrams occurrences
@@ -708,7 +713,7 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     # form class
     segmented = chunks_detection(seqs, chunks, write_fun=chunk_segmentation)
     fc_seqs = segmented[3]
-    dc = fc.distributional_context(fc_seqs,3)
+    dc = fc.distributional_context(fc_seqs,1)
     # print("---- dc ---- ")
     # pp.pprint(dc)
     classes = fc.form_classes(dc)
@@ -717,8 +722,8 @@ def compute(seqs, dir_name="noDir", filename="noName", write_to_file=True):
     #########################################################################
     # write
     if write_to_file:
-        # with open(dir_name + filename + "_mdl.json", "w") as fp:
-        #     json.dump(mdl, fp, default=serialize_sets)
+        with open(dir_name + filename + "_mdl.json", "w") as fp:
+            json.dump(mdl, fp, default=serialize_sets)
         with open(dir_name + filename + "_tf.json", "w") as fp:
             json.dump(tf, fp)
         with open(dir_name + filename + "_tf_seqs.json", "w") as fp:

@@ -7,7 +7,7 @@ import utils
 pp = pprint.PrettyPrinter(indent=2)
 
 # threshold for classes
-THS = 2.0
+THS = 1.0
 
 
 # records pre- and post- lists of words (and the number of occurrences of each of them) that come
@@ -37,13 +37,13 @@ def distributional_context(sequences, order=1):
                                 else:
                                     res[el]["dx"][values[index + i]] = 1
                     # order results
-                    res[el]["dx"] = OrderedDict(sorted(res[el]["dx"].items(), key=lambda x: x[1], reverse=True))
-                    res[el]["sx"] = OrderedDict(sorted(res[el]["sx"].items(), key=lambda x: x[1], reverse=True))
+                    res[el]["dx"] = OrderedDict(sorted(res[el]["dx"].items(), key=lambda x: x[0], reverse=True))
+                    res[el]["sx"] = OrderedDict(sorted(res[el]["sx"].items(), key=lambda x: x[0], reverse=True))
     return res
 
 
 # evaluates form classes
-def first_last(dist_ctx):
+def first_last_classes(dist_ctx):
     # print initial and ending classes
     first_set = []
     last_set = []
@@ -66,17 +66,18 @@ def search(k,arr):
 
 def form_classes(dist_ctx):
     angles = dict()
+    coords = dist_ctx.keys()
+    # evaluates words distance, context similarity
     for itm1 in dist_ctx.items():
         if itm1[0] not in angles:
             angles[itm1[0]] = dict()
             for itm2 in dist_ctx.items():
                 if (itm2[0] != itm1[0]) and (itm2[0] not in angles[itm1[0]]):
                     # calculates pre- and post- contexts similarity (angles)
-                    v1 = utils.angle_from_dict(itm1[1]["sx"],itm2[1]["sx"])
-                    v2 = utils.angle_from_dict(itm1[1]["dx"],itm2[1]["dx"])
+                    v1 = utils.angle_from_dict(itm1[1]["sx"],itm2[1]["sx"], coords)
+                    v2 = utils.angle_from_dict(itm1[1]["dx"],itm2[1]["dx"], coords)
                     angles[itm1[0]][itm2[0]] = (v1 + v2)/2
-    # print("angles: ")
-    # pp.pprint(angles)
+    # evaluates form classes
     res = dict()
     idx = 1
     for k,values in angles.items():
@@ -86,10 +87,8 @@ def form_classes(dist_ctx):
             sim.update(x[0] for x in values.items() if float(x[1]) < THS)
             res[idx] = sim
             idx += 1
-
     print("res: ")
     pp.pprint(res)
-
     return res
 
 
@@ -115,4 +114,35 @@ def classes_patterns(classes,sequences):
     print("class patterns: ")
     pp.pprint(res)
     return res
+
+
+# given a sequence calculate its pattern based on classes
+def evaluate_seq(sequence, classes, patterns):
+    iseq = sequence
+    res_patt = ""
+    while len(iseq) > 0:
+        iseq2 = iseq
+        for cl in classes.items():
+            fnd = False
+            i = 0
+            lst = list(cl[1])
+            while i < len(lst) and (not fnd):
+                if iseq.find(lst[i]) == 0:
+                    fnd = True
+                    res_patt += " " + str(cl[0])
+                    iseq = iseq[len(lst[i]):].strip(" ")
+                else:
+                    i += 1
+        if iseq2 == iseq:
+            return 0
+    return 1 if res_patt.strip(" ") in patterns else 0
+
+
+# # evaluate generated sequences with form classes and pattern
+def evaluate_sequences(sequences, classes, patterns):
+    res = []
+    for seq in sequences:
+        res.append(evaluate_seq(seq, classes, patterns))
+    return res
+
 
