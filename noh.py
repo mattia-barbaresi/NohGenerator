@@ -18,8 +18,8 @@ katas = {
     "circlet left": "xxxx",  # hidari mawarikomi
     "circlet right": "wwww",  # migi mawarikomi
     "circlet point": "xxxxxxxxszbyrs",  # (mawari kaeshi): two complete Circlets and concludes with a Forward point
-    "forward-point":"zsz",  # shikake
-    "open-retreat":"sbyrs",  # hiraki
+    "forward-point":"zb",  # shikake
+    "open-retreat":"ycrs",  # hiraki
     "backing-point":"syebs",  # sashi
     "scooping-point":"swbexbs",  # kaikomi
     "double-sweep":"wfzhxzrybzwzw",  # sashi wake
@@ -54,7 +54,7 @@ shimai_dances_full = {
 shimai_dances = {
     "hasitomi-kuze":[".",":","z","w","zzz","yy","x","zsz","sbyrs","x","zzz","y","l","o","w","zsz","sbyrs","w","x","w","x","t","w","xmhzwbz","x","swbexbs","sbyrs","wzwz","x","x","t","w","x","syebs","xzxz","xmhzwbz","wbexbsvs","."],
     "hasitomi-kiri":[".",":","xmhzwbz","swbexbs","sbyrs","x","w","zzzzzz","w","zz","xxxx","zsz","wzwz","w","zz","xzxz","zsz","sbyrs","w","wwww","wbexbsvs","."],
-    "kokaji-kuse":[".",":","zzzz","zsz","sbyrs","zzzzzzz","xzxz","swbexbs","zzzzzzzzzz","xzxz","sbyrs","<><",".",":","xzxz","swbexbs","sbyrs","wzwz","swbexbs","sbyrs","x","zzz","xxxx","zz","x","swbexbs","zzzzzzzzz","sbyrs","w","yyyy","wbexbsvs","."],
+    "kokaji-kuse":[".",":","zzzz","zsz","sbyrs","zzzzzzz","xzxz","swbexbs","zzzzzzzzzz","xzxz","sbyrs","<><","xzxz","swbexbs","sbyrs","wzwz","swbexbs","sbyrs","x","zzz","xxxx","zz","x","swbexbs","zzzzzzzzz","sbyrs","w","yyyy","wbexbsvs","."],
     "kokaji-kiri":[".",":","zz","wwww","wzwz","zsz","w","zz","sbyrs","<><","wfzhxzrybzwzw","wzwz","swbexbs","sbyrs","t","zz","yyyyyyyyy","b","zz","wwww","zz","w","y","."],
 }
 
