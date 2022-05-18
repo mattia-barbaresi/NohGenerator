@@ -54,5 +54,9 @@ LIST_OF_MOVES = {
     "w": "right",
     "x": "left",
     "y": "backward",
-    "z": "forward"
+    "z": "forward",
+    ".": "kneel",
+    ":": "standup",
+    "<":"data/poses/headleft",
+    ">":"data/poses/headright",
 }
